@@ -95,19 +95,19 @@ export function HomeList() {
 			</div>
 
 			{goals ? (
-				goals.data.length ? (
-					goals.data
-						.filter(
+				goals?.data?.length ? (
+					goals?.data
+						?.filter(
 							(goal: Goal) =>
 								urgencyLevel === 'all' ||
 								goal.urgencyLevel.toLowerCase() === urgencyLevel
 						)
-						.sort((a: Goal, b: Goal) => {
+						?.sort((a: Goal, b: Goal) => {
 							if (a.isCompleted && !b.isCompleted) return 1
 							if (!a.isCompleted && b.isCompleted) return -1
 							return 0
 						})
-						.map((goal: Goal, index: number) => (
+						?.map((goal: Goal, index: number) => (
 							<HomeListItem goal={goal} key={index} index={index + 1} />
 						))
 				) : (
