@@ -78,7 +78,7 @@ export function SettingsFriendsGoals() {
 									{friendGoals ? (
 										friendGoals?.map((friendGoal: any, index: number) => {
 											const subGoals = friendGoal.subGoals
-											const completedSubGoals = subGoals.filter(
+											const completedSubGoals = subGoals?.filter(
 												(subGoal: SubGoal) => subGoal.isCompleted
 											)
 											const percent =
