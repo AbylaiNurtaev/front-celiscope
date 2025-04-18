@@ -24,14 +24,10 @@ export function HomeListItem({ goal, index }: Props) {
 
 	const { isCompleted } = goal
 
-	const isExpired =
-		new Date(goal.deadline) <
-		(goal.completedAt ? new Date(goal.completedAt) : new Date())
+	const isExpired = !isCompleted && new Date(goal.deadline) < new Date()
 
 	const isSubGoalExpired = goal.subGoals?.some(
-		subGoal =>
-			new Date(subGoal.deadline) <
-			(subGoal.completedAt ? new Date(subGoal.completedAt) : new Date())
+		subGoal => !subGoal.isCompleted && new Date(subGoal.deadline) < new Date()
 	)
 
 	return (

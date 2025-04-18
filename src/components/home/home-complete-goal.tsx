@@ -1,15 +1,23 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { DialogContext } from '../ui/dialog'
 import { useCompleteGoal } from '../../hooks/useGoal'
+import { AchievementPopup } from '../AchievementPopup'
 
 export function HomeCompleteGoal({ goalId }: { goalId: number }) {
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
+	const [showAchievement, setShowAchievement] = useState(false)
 	const { mutate: completeGoal, isPending, isSuccess } = useCompleteGoal(goalId)
 
 	useEffect(() => {
-		if (isSuccess) closeDialog?.()
+		if (isSuccess) {
+			setShowAchievement(true)
+			setTimeout(() => {
+				setShowAchievement(false)
+				closeDialog?.()
+			}, 2000)
+		}
 	}, [isSuccess])
 
 	return (
@@ -27,6 +35,7 @@ export function HomeCompleteGoal({ goalId }: { goalId: number }) {
 				className='hidden'
 				onChange={e => completeGoal(e.target.files?.[0])}
 			/>
+			<AchievementPopup isOpen={showAchievement} onClose={() => setShowAchievement(false)} />
 		</>
 	)
 }

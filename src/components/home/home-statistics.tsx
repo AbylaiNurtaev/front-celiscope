@@ -7,29 +7,64 @@ import {
 	XAxis,
 	YAxis,
 } from 'recharts'
-
-const barChartData = [
-	{ name: '1 Цель', percent: 60 },
-	{ name: '2 Цель', percent: 90 },
-	{ name: '3 Цель', percent: 40 },
-]
-
-const lineChartData = [
-	{ name: 'Янв.', goals: 3 },
-	{ name: 'Фев.', goals: 1 },
-	{ name: 'Март', goals: 8 },
-	{ name: 'Апр.', goals: 4 },
-	{ name: 'Май', goals: 12 },
-	{ name: 'Июнь', goals: 15 },
-	{ name: 'Июль', goals: 10 },
-	{ name: 'Авг.', goals: 4 },
-	{ name: 'Сент.', goals: 1 },
-	{ name: 'Окт.', goals: 0 },
-	{ name: 'Нояб.', goals: 2 },
-	{ name: 'Дек.', goals: 15 },
-]
+import { useGetGoals } from '../../hooks/useGoal'
+import { Goal } from '../../types/goal'
+import { useMemo } from 'react'
 
 export function HomeStatistics() {
+	const { data: goalsData } = useGetGoals()
+	
+	// Подготавливаем данные для графика прогресса целей
+	const barChartData = useMemo(() => {
+		if (!goalsData?.data) return []
+		
+		// Берем только первые 3 цели для отображения
+		return goalsData.data.slice(0, 3).map((goal: Goal) => {
+			// Вычисляем процент выполнения на основе подцелей
+			const totalSubGoals = goal.subGoals?.length || 0
+			const completedSubGoals = goal.subGoals?.filter(sub => sub.isCompleted).length || 0
+			const percent = totalSubGoals > 0 
+				? Math.round((completedSubGoals / totalSubGoals) * 100) 
+				: goal.isCompleted ? 100 : 0
+				
+			return {
+				name: goal.title,
+				percent
+			}
+		})
+	}, [goalsData])
+	
+	// Подготавливаем данные для графика выполненных задач по месяцам
+	const lineChartData = useMemo(() => {
+		if (!goalsData?.data) return []
+		
+		// Создаем массив для всех месяцев
+		const months = [
+			'Янв.', 'Фев.', 'Март', 'Апр.', 'Май', 'Июнь',
+			'Июль', 'Авг.', 'Сент.', 'Окт.', 'Нояб.', 'Дек.'
+		]
+		
+		// Инициализируем данные для каждого месяца
+		const monthlyData = months.map(name => ({ name, goals: 0 }))
+		
+		// Подсчитываем выполненные цели по месяцам
+		goalsData.data.forEach((goal: Goal) => {
+			if (goal.isCompleted && goal.completedAt) {
+				const completedDate = new Date(goal.completedAt)
+				const monthIndex = completedDate.getMonth()
+				monthlyData[monthIndex].goals++
+			}
+		})
+		
+		return monthlyData
+	}, [goalsData])
+	
+	// Подсчитываем общее количество целей
+	const totalGoals = goalsData?.data?.length || 0
+	
+	// Подсчитываем количество выполненных целей
+	const completedGoals = goalsData?.data?.filter((goal: Goal) => goal.isCompleted).length || 0
+
 	return (
 		<section className='font-bold text-lg w-full pt-2 px-4'>
 			<div className='relative p-[3px] rounded-xl'>
@@ -43,10 +78,10 @@ export function HomeStatistics() {
 					<div className='border-b-2 border-[#2F51A8] flex flex-col pt-2 px-2'>
 						<div className='w-full flex items-center justify-between max-[380px]:flex-col mb-5'>
 							<span className='text-lg font-normal text-nowrap max-[520px]:text-sm max-[440px]:text-xs'>
-								Всего целей: <span className='font-bold'>100</span>
+								Всего целей: <span className='font-bold'>{totalGoals}</span>
 							</span>
 							<span className='text-lg font-normal text-nowrap max-[520px]:text-sm max-[440px]:text-xs'>
-								Прогрес целей | <span className='font-bold'>ТОП 10</span>
+								Прогресс целей | <span className='font-bold'>ТОП {barChartData.length}</span>
 							</span>
 						</div>
 						<ResponsiveContainer height={120} className='-ml-5'>
@@ -72,7 +107,7 @@ export function HomeStatistics() {
 					</div>
 					<div className='relative flex flex-col p-2'>
 						<span className='font-normal text-sm text-nowrap'>
-							Выполненые задачи:
+							Выполненные задачи: <span className='font-bold'>{completedGoals}</span>
 						</span>
 						<div className='w-full'>
 							<ResponsiveContainer height={120} className='mt-4 -ml-6'>

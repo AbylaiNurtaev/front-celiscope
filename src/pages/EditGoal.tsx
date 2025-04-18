@@ -36,6 +36,7 @@ interface Form {
 	deadline: '3_MONTHS' | '6_MONTHS' | '1_YEAR'
 	subGoals?: { description: string; deadline: Date }[]
 	image: File
+	currentGoal?: any
 }
 
 const convertDateToDeadline = (date: Date): '3_MONTHS' | '6_MONTHS' | '1_YEAR' => {
@@ -86,6 +87,7 @@ export function EditGoal() {
 				...subGoal,
 				deadline: subGoal.deadline ? new Date(subGoal.deadline) : new Date()
 			})) || [])
+			setValue('currentGoal', goal)
 		}
 	}, [goal])
 
@@ -94,7 +96,7 @@ export function EditGoal() {
 			'description',
 			`${watch('specific')} ${watch('measurable')} ${watch(
 				'attainable'
-			)} ${watch('relevant')}\n${watch('award')}`
+			)} ${watch('relevant')}\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
 		)
 	}, [
 		watch('specific'),
@@ -120,10 +122,11 @@ export function EditGoal() {
 			<form
 				onSubmit={handleSubmit(data => {
 					console.log('Form data before cleaning:', data)
+					const { currentGoal, ...dataWithoutCurrentGoal } = data
 					const cleanedData = {
-						...data,
-						deadline: data.deadline || '3_MONTHS',
-						subGoals: data.subGoals?.map(subGoal => ({
+						...dataWithoutCurrentGoal,
+						deadline: dataWithoutCurrentGoal.deadline || '3_MONTHS',
+						subGoals: dataWithoutCurrentGoal.subGoals?.map(subGoal => ({
 							description: subGoal.description,
 							deadline: subGoal.deadline
 						}))

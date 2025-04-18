@@ -53,7 +53,7 @@ export function CreateGoal() {
 			'description',
 			`${watch('specific')} ${watch('measurable')} ${watch(
 				'attainable'
-			)} ${watch('relevant')}\n${watch('award')}`
+			)} ${watch('relevant')}\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
 		)
 	}, [
 		watch('specific'),
@@ -80,7 +80,13 @@ export function CreateGoal() {
 			<form
 				onSubmit={handleSubmit(data => {
 					console.log(data)
-					createGoal({ data })
+					createGoal({
+						data: {
+							...data,
+							description: data.description,
+							award: data.award ? `Награда: ${data.award}` : undefined,
+						},
+					})
 				})}
 			>
 				<section className='px-4 pt-5 flex flex-col gap-5 w-full'>
