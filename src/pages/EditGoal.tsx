@@ -56,7 +56,7 @@ export function EditGoal() {
 	
 	const { data: goal } = useGetGoal(Number(id))
 	
-	const { register, handleSubmit, setValue, watch, reset } = useForm<Form>({
+	const { register, handleSubmit, setValue, watch } = useForm<Form>({
 		defaultValues: {
 			privacy: goal?.privacy || 'PRIVATE',
 			deadline: goal?.deadline || '3_MONTHS',
