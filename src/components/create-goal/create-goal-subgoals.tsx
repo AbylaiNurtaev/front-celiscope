@@ -1,7 +1,7 @@
 import { CheckIcon, EditIcon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormSetValue, UseFormWatch } from 'react-hook-form'
-import toast from 'react-hot-toast'
+
 import Popup from 'reactjs-popup'
 import { Block } from '../ui/block'
 import { Button } from '../ui/button'
@@ -23,25 +23,17 @@ export function CreateGoalSubGoal({
 	}, [watch('subGoals')])
 
 	const handleAddSubGoal = () => {
-		const value = watch('subGoals')
-
-		if (!subGoalTemp || !subGoalDateTemp) {
-			toast.error('Заполните все поля')
-			return
-		}
-
-		if (value) {
-			setValue('subGoals', [
-				...value,
-				{ description: subGoalTemp, deadline: subGoalDateTemp },
-			])
-		} else {
-			setValue('subGoals', [
-				{ description: subGoalTemp, deadline: subGoalDateTemp },
-			])
-		}
+		const subGoals = watch('subGoals') || []
+		setValue('subGoals', [
+			...subGoals,
+			{
+				description: subGoalTemp,
+				deadline: subGoalDateTemp
+			},
+		])
 		setSubGoalTemp('')
-		setSubGoalDateTemp(null)
+		setSubGoalDateTemp(new Date())
+		setSubGoalCreateOpen(false)
 	}
 
 	const handleRemoveSubGoal = (index: number) => {
@@ -58,22 +50,21 @@ export function CreateGoalSubGoal({
 	}
 
 	const handleUpdateSubGoal = () => {
-		if (editingIndex === null) return
-
-		const updatedSubGoals = watch('subGoals').map((goal: any, index: number) =>
-			index === editingIndex
-				? { 
-					description: subGoalTemp, 
-					deadline: subGoalDateTemp || goal.deadline 
+		const subGoals = watch('subGoals') || []
+		const updatedSubGoals = subGoals.map((subGoal: any, i: number) => {
+			if (i === editingIndex) {
+				return {
+					description: subGoalTemp,
+					deadline: subGoalDateTemp
 				}
-				: goal
-		)
-
+			}
+			return subGoal
+		})
 		setValue('subGoals', updatedSubGoals)
-		setEditingIndex(null)
 		setSubGoalTemp('')
-		setSubGoalDateTemp(null)
+		setSubGoalDateTemp(new Date())
 		setSubGoalCreateOpen(false)
+		setEditingIndex(null)
 	}
 
 	return (

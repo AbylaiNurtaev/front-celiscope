@@ -22,6 +22,7 @@ import {
 } from '../components/create-goal'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 interface Form {
 	title: string
@@ -34,7 +35,7 @@ interface Form {
 	relevant: string
 	privacy: 'PRIVATE' | 'PUBLIC'
 	deadline: '3_MONTHS' | '6_MONTHS' | '1_YEAR'
-	subGoals?: { description: string; deadline: Date }[]
+	subGoals?: { id?: number; description: string; deadline: Date; isCompleted: boolean }[]
 	image: File
 	currentGoal?: any
 }
@@ -94,9 +95,9 @@ export function EditGoal() {
 	useEffect(() => {
 		setValue(
 			'description',
-			`${watch('specific')} ${watch('measurable')} ${watch(
+			`${watch('specific')}, ${watch('measurable')}, ${watch(
 				'attainable'
-			)} ${watch('relevant')}\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
+			)}, ${watch('relevant')}\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
 		)
 	}, [
 		watch('specific'),
@@ -123,12 +124,25 @@ export function EditGoal() {
 				onSubmit={handleSubmit(data => {
 					console.log('Form data before cleaning:', data)
 					const { currentGoal, ...dataWithoutCurrentGoal } = data
+					
+					if (!dataWithoutCurrentGoal.image && !currentGoal?.imageUrl) {
+						toast.error('Пожалуйста, загрузите фото для цели')
+						return
+					}
+					
+					if (!dataWithoutCurrentGoal.subGoals || dataWithoutCurrentGoal.subGoals.length === 0) {
+						toast.error('Пожалуйста, добавьте хотя бы одну задачу')
+						return
+					}
+					
 					const cleanedData = {
 						...dataWithoutCurrentGoal,
 						deadline: dataWithoutCurrentGoal.deadline || '3_MONTHS',
+						privacy: currentGoal?.privacy || dataWithoutCurrentGoal.privacy || 'PRIVATE',
+						award: dataWithoutCurrentGoal.award,
 						subGoals: dataWithoutCurrentGoal.subGoals?.map(subGoal => ({
 							description: subGoal.description,
-							deadline: subGoal.deadline
+							deadline: new Date(subGoal.deadline)
 						}))
 					}
 					console.log('Cleaned data to send:', cleanedData)
@@ -154,7 +168,7 @@ export function EditGoal() {
 					<CreateGoalDeadline setValue={setValue} />
 					<CreateGoalSubGoal watch={watch} setValue={setValue} />
 					<CreateGoalImageField watch={watch} setValue={setValue} />
-					<CreateGoalPrivacy setValue={setValue} />
+					<CreateGoalPrivacy setValue={setValue} watch={watch} />
 				</section>
 
 				<div className='flex justify-end px-4'>

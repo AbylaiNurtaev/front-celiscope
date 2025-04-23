@@ -1,11 +1,15 @@
-import { UseFormSetValue } from 'react-hook-form'
+import { UseFormSetValue, UseFormWatch } from 'react-hook-form'
 import { Block } from '../ui/block'
 
 export function CreateGoalPrivacy({
 	setValue,
+	watch,
 }: {
 	setValue: UseFormSetValue<any>
+	watch: UseFormWatch<any>
 }) {
+	const currentPrivacy = watch('privacy')
+
 	return (
 		<Block title='Хотите ли транслировать выполнение цели друзьям?'>
 			<div className='w-full px-4 flex items-center gap-4 justify-center flex-wrap'>
@@ -14,7 +18,7 @@ export function CreateGoalPrivacy({
 						name='privacy'
 						type='radio'
 						id='private'
-						defaultChecked
+						checked={currentPrivacy === 'PRIVATE'}
 						onChange={e => e.target.checked && setValue('privacy', 'PRIVATE')}
 						className='w-6 h-6 accent-black'
 					/>
@@ -25,6 +29,7 @@ export function CreateGoalPrivacy({
 						name='privacy'
 						type='radio'
 						id='public'
+						checked={currentPrivacy === 'PUBLIC'}
 						onChange={e => e.target.checked && setValue('privacy', 'PUBLIC')}
 						className='w-6 h-6 accent-black'
 					/>

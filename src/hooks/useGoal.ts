@@ -47,6 +47,7 @@ export function useCompleteSubGoal(id: number) {
 		},
 	})
 }
+
 export function useCompleteGoal(id: number) {
 	const queryClient = useQueryClient()
 	return useMutation({
@@ -101,6 +102,21 @@ export function useUpdateGoal(id: number, cb?: () => void) {
 			queryClient.invalidateQueries({ queryKey: ['get goals'] })
 			queryClient.invalidateQueries({ queryKey: ['get goal', id] })
 			cb?.()
+		},
+	})
+}
+
+export function useUncompleteSubGoal(id: number) {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: async () => {
+			const res = await goalService.uncompleteSubGoal(id)
+			if (res?.status !== 200) throw new Error()
+			return res
+		},
+		onSuccess: () => {
+			toast.success('Отметка о выполнении задачи снята!')
+			queryClient.invalidateQueries({ queryKey: ['get goals'] })
 		},
 	})
 }

@@ -6,7 +6,7 @@ interface Props {
 
 export function LoginPin({ setPin }: Props) {
 	return (
-		<div className='mt-12 px-3'>
+		<div className='mt-6 px-3'>
 			<div
 				className='rounded-t-lg text-white px-2 py-0.5 text-sm'
 				style={{
@@ -23,7 +23,7 @@ export function LoginPin({ setPin }: Props) {
 					}}
 				/>
 
-				<div className='relative bg-white flex items-center justify-center rounded-b-md py-4'>
+				<div className='relative bg-white flex items-center justify-center rounded-b-md py-3'>
 					<OTPInput length={4} onComplete={setPin} />
 				</div>
 			</div>

@@ -84,8 +84,7 @@ export function SettingsFriendsGoals() {
 											const percent =
 												completedSubGoals.length === 0 && subGoals.length === 0
 													? 100
-													: (completedSubGoals.length / subGoals.length) *
-															100 || 0
+													: Number(((completedSubGoals.length / subGoals.length) * 100).toFixed(2)) || 0
 
 											const status =
 												percent === 100

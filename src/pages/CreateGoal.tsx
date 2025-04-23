@@ -21,6 +21,7 @@ import {
 } from '../components/create-goal'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 interface Form {
 	title: string
@@ -51,9 +52,9 @@ export function CreateGoal() {
 	useEffect(() => {
 		setValue(
 			'description',
-			`${watch('specific')} ${watch('measurable')} ${watch(
+			`${watch('specific')}, ${watch('measurable')}, ${watch(
 				'attainable'
-			)} ${watch('relevant')}\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
+			)}, ${watch('relevant')}\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
 		)
 	}, [
 		watch('specific'),
@@ -79,13 +80,30 @@ export function CreateGoal() {
 
 			<form
 				onSubmit={handleSubmit(data => {
-					console.log(data)
+					console.log('Form data before cleaning:', data)
+					
+					if (!data.image) {
+						toast.error('Пожалуйста, загрузите фото для цели')
+						return
+					}
+					
+					if (!data.subGoals || data.subGoals.length === 0) {
+						toast.error('Пожалуйста, добавьте хотя бы одну задачу')
+						return
+					}
+					
+					const cleanedData = {
+						...data,
+						description: data.description,
+						award: data.award ? `Награда: ${data.award}` : undefined,
+						subGoals: data.subGoals?.map(subGoal => ({
+							description: subGoal.description,
+							deadline: subGoal.deadline
+						}))
+					}
+					console.log('Cleaned data to send:', cleanedData)
 					createGoal({
-						data: {
-							...data,
-							description: data.description,
-							award: data.award ? `Награда: ${data.award}` : undefined,
-						},
+						data: cleanedData
 					})
 				})}
 			>
@@ -108,7 +126,7 @@ export function CreateGoal() {
 					<CreateGoalDeadline setValue={setValue} />
 					<CreateGoalSubGoal watch={watch} setValue={setValue} />
 					<CreateGoalImageField watch={watch} setValue={setValue} />
-					<CreateGoalPrivacy setValue={setValue} />
+					<CreateGoalPrivacy setValue={setValue} watch={watch} />
 				</section>
 
 				<div className='flex justify-end px-4'>

@@ -25,6 +25,10 @@ class GoalService {
 		return await api.post(`/goal/sub-goal/${id}/complete`)
 	}
 
+	async uncompleteSubGoal(id: number) {
+		return await api.post(`/goal/sub-goal/${id}/uncomplete`)
+	}
+
 	async completeGoal(id: number, formData: FormData) {
 		return await api.post(`/goal/${id}/complete`, formData, {
 			headers: { 'Content-Type': 'multipart/form-data' },

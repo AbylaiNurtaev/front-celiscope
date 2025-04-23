@@ -18,20 +18,24 @@ export function HomeStatistics() {
 	const barChartData = useMemo(() => {
 		if (!goalsData?.data) return []
 		
-		// Берем только первые 3 цели для отображения
-		return goalsData.data.slice(0, 3).map((goal: Goal) => {
-			// Вычисляем процент выполнения на основе подцелей
-			const totalSubGoals = goal.subGoals?.length || 0
-			const completedSubGoals = goal.subGoals?.filter(sub => sub.isCompleted).length || 0
-			const percent = totalSubGoals > 0 
-				? Math.round((completedSubGoals / totalSubGoals) * 100) 
-				: goal.isCompleted ? 100 : 0
-				
-			return {
-				name: goal.title,
-				percent
-			}
-		})
+		// Фильтруем незавершенные цели и сортируем по количеству подзадач
+		return goalsData.data
+			.filter((goal: Goal) => !goal.isCompleted)
+			.sort((a: Goal, b: Goal) => (b.subGoals?.length || 0) - (a.subGoals?.length || 0))
+			.slice(0, 10)
+			.map((goal: Goal) => {
+				// Вычисляем процент выполнения на основе подцелей
+				const totalSubGoals = goal.subGoals?.length || 0
+				const completedSubGoals = goal.subGoals?.filter(sub => sub.isCompleted).length || 0
+				const percent = totalSubGoals > 0 
+					? Math.round((completedSubGoals / totalSubGoals) * 100) 
+					: 0
+					
+				return {
+					name: goal.title,
+					percent
+				}
+			})
 	}, [goalsData])
 	
 	// Подготавливаем данные для графика выполненных задач по месяцам
@@ -81,7 +85,7 @@ export function HomeStatistics() {
 								Всего целей: <span className='font-bold'>{totalGoals}</span>
 							</span>
 							<span className='text-lg font-normal text-nowrap max-[520px]:text-sm max-[440px]:text-xs'>
-								Прогресс целей | <span className='font-bold'>ТОП {barChartData.length}</span>
+								Прогресс целей | <span className='font-bold'>ТОП {Math.min(10, goalsData?.data?.filter((goal: Goal) => !goal.isCompleted).length || 0)}</span>
 							</span>
 						</div>
 						<ResponsiveContainer height={120} className='-ml-5'>
