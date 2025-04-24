@@ -66,8 +66,8 @@ export function HomeListItem({ goal, index }: Props) {
 					<div className='relative bg-white rounded-b-md p-2'>
 						<div className='flex gap-1 items-center'>
 							<h3 className='text-sm font-bold'>Описание:</h3>
-							<span className='w-full text-xs whitespace-pre-wrap	'>
-								{goal.description}
+							<span className='w-full text-xs whitespace-pre-wrap'>
+								{goal.description.replace(/\n\nНаграда:/, '\nНаграда:')}
 							</span>
 							<Dialog
 								title='Для подтверждении цели приложите фото'

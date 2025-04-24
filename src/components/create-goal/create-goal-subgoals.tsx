@@ -44,7 +44,7 @@ export function CreateGoalSubGoal({
 	const handleEditSubGoal = (index: number) => {
 		const subGoal = watch('subGoals')[index]
 		setSubGoalTemp(subGoal.description)
-		setSubGoalDateTemp(new Date(subGoal.deadline))
+		setSubGoalDateTemp(subGoal.deadline ? new Date(subGoal.deadline) : new Date())
 		setEditingIndex(index)
 		setSubGoalCreateOpen(true)
 	}
@@ -54,8 +54,9 @@ export function CreateGoalSubGoal({
 		const updatedSubGoals = subGoals.map((subGoal: any, i: number) => {
 			if (i === editingIndex) {
 				return {
+					...subGoal,
 					description: subGoalTemp,
-					deadline: subGoalDateTemp
+					deadline: subGoalDateTemp || new Date()
 				}
 			}
 			return subGoal

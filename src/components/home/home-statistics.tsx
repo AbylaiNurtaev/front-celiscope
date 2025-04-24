@@ -23,7 +23,7 @@ export function HomeStatistics() {
 			.filter((goal: Goal) => !goal.isCompleted)
 			.sort((a: Goal, b: Goal) => (b.subGoals?.length || 0) - (a.subGoals?.length || 0))
 			.slice(0, 10)
-			.map((goal: Goal) => {
+			.map((goal: Goal, index: number) => {
 				// Вычисляем процент выполнения на основе подцелей
 				const totalSubGoals = goal.subGoals?.length || 0
 				const completedSubGoals = goal.subGoals?.filter(sub => sub.isCompleted).length || 0
@@ -32,7 +32,7 @@ export function HomeStatistics() {
 					: 0
 					
 				return {
-					name: goal.title,
+					name: `№${index + 1}`,
 					percent
 				}
 			})
@@ -104,7 +104,7 @@ export function HomeStatistics() {
 								</defs>
 
 								<XAxis dataKey='name' fontSize={12} />
-								<YAxis dataKey='percent' fontSize={12} max={100} min={0} />
+								<YAxis dataKey='percent' fontSize={12} max={100} min={0} tickFormatter={(value) => `${value}%`} />
 								<Bar dataKey='percent' fill='url(#gradient1)' />
 							</BarChart>
 						</ResponsiveContainer>

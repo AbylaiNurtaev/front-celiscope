@@ -46,7 +46,13 @@ export function SettingsFriendsGoals() {
 					{friends?.map(friend => {
 						const friendGoals = friendsGoals?.filter(
 							goal => goal.userId === friend.id
-						)
+						)?.sort((a: any, b: any) => {
+							// Сначала сортируем по статусу выполнения
+							if (a.isCompleted && !b.isCompleted) return 1
+							if (!a.isCompleted && b.isCompleted) return -1
+							// Затем сортируем по дате создания (новые сверху)
+							return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+						})
 
 						return (
 							<details key={friend.id}>

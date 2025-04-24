@@ -54,7 +54,7 @@ export function CreateGoal() {
 			'description',
 			`${watch('specific')}, ${watch('measurable')}, ${watch(
 				'attainable'
-			)}, ${watch('relevant')}\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
+			)}, ${watch('relevant')}\n\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
 		)
 	}, [
 		watch('specific'),

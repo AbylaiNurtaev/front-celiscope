@@ -17,7 +17,7 @@ export function HomeCompleteGoal({ goalId }: { goalId: number }) {
 			setTimeout(() => {
 				setShowAchievement(false)
 				closeDialog?.()
-			}, 2000)
+			}, 5000)
 		}
 	}, [isSuccess])
 

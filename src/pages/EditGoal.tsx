@@ -97,7 +97,7 @@ export function EditGoal() {
 			'description',
 			`${watch('specific')}, ${watch('measurable')}, ${watch(
 				'attainable'
-			)}, ${watch('relevant')}\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
+			)}, ${watch('relevant')}\n\n${watch('award') ? `Награда: ${watch('award')}` : ''}`
 		)
 	}, [
 		watch('specific'),
@@ -138,7 +138,7 @@ export function EditGoal() {
 					const cleanedData = {
 						...dataWithoutCurrentGoal,
 						deadline: dataWithoutCurrentGoal.deadline || '3_MONTHS',
-						privacy: currentGoal?.privacy || dataWithoutCurrentGoal.privacy || 'PRIVATE',
+						privacy: dataWithoutCurrentGoal.privacy || 'PRIVATE',
 						award: dataWithoutCurrentGoal.award,
 						subGoals: dataWithoutCurrentGoal.subGoals?.map(subGoal => ({
 							description: subGoal.description,
