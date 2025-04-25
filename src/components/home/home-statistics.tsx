@@ -18,10 +18,10 @@ export function HomeStatistics() {
 	const barChartData = useMemo(() => {
 		if (!goalsData?.data) return []
 		
-		// Фильтруем незавершенные цели и сортируем по количеству подзадач
+		// Фильтруем незавершенные цели и сортируем по дате создания (новые сверху)
 		return goalsData.data
 			.filter((goal: Goal) => !goal.isCompleted)
-			.sort((a: Goal, b: Goal) => (b.subGoals?.length || 0) - (a.subGoals?.length || 0))
+			.sort((a: Goal, b: Goal) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 			.slice(0, 10)
 			.map((goal: Goal, index: number) => {
 				// Вычисляем процент выполнения на основе подцелей

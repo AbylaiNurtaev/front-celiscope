@@ -8,7 +8,13 @@ export function HomeCompleteGoal({ goalId, award }: { goalId: number; award?: st
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
 	const [showAchievement, setShowAchievement] = useState(false)
+	const [savedAward, setSavedAward] = useState<string | undefined>(award)
 	const { mutate: completeGoal, isPending, isSuccess } = useCompleteGoal(goalId)
+
+	// Сохраняем награду при первом рендере
+	useEffect(() => {
+		setSavedAward(award)
+	}, [])
 
 	useEffect(() => {
 		if (isSuccess) {
@@ -38,7 +44,7 @@ export function HomeCompleteGoal({ goalId, award }: { goalId: number; award?: st
 			<AchievementPopup 
 				isOpen={showAchievement} 
 				onClose={() => setShowAchievement(false)}
-				award={award}
+				award={savedAward}
 			/>
 		</>
 	)
