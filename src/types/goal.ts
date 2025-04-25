@@ -9,6 +9,7 @@ export interface Goal {
 	isCompleted: boolean
 	imageUrl: string
 	createdAt: Date
+	award?: string
 }
 
 export interface SubGoal {
