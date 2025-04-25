@@ -1,15 +1,14 @@
 import { useContext, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { DialogContext } from '../ui/dialog'
-import { useCompleteGoal, useGetGoal } from '../../hooks/useGoal'
+import { useCompleteGoal } from '../../hooks/useGoal'
 import { AchievementPopup } from '../AchievementPopup'
 
-export function HomeCompleteGoal({ goalId }: { goalId: number }) {
+export function HomeCompleteGoal({ goalId, award }: { goalId: number; award?: string }) {
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
 	const [showAchievement, setShowAchievement] = useState(false)
 	const { mutate: completeGoal, isPending, isSuccess } = useCompleteGoal(goalId)
-	const { data: goal } = useGetGoal(goalId)
 
 	useEffect(() => {
 		if (isSuccess) {
@@ -39,7 +38,7 @@ export function HomeCompleteGoal({ goalId }: { goalId: number }) {
 			<AchievementPopup 
 				isOpen={showAchievement} 
 				onClose={() => setShowAchievement(false)}
-				award={goal?.award}
+				award={award}
 			/>
 		</>
 	)

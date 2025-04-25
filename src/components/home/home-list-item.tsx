@@ -84,7 +84,7 @@ export function HomeListItem({ goal, index }: Props) {
 									/>
 								}
 							>
-								<HomeCompleteGoal goalId={goal.id} />
+								<HomeCompleteGoal goalId={goal.id} award={goal.award} />
 							</Dialog>
 						</div>
 						<div className='text-xs w-min ml-auto mt-2 bg-[#727473] text-white text-nowrap rounded-md px-4 py-1'>
