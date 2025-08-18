@@ -1,15 +1,19 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
+import { useAuthStore } from '../store/auth.store'
 
 export function HelloPage() {
 	const navigate = useNavigate()
+	const { isAuth } = useAuthStore()
 
 	useEffect(() => {
 		setTimeout(() => {
 			sessionStorage.setItem('helloShown', 'true')
-			navigate('/login')
+			// Если пользователь уже авторизован, идем на главную
+			// Иначе на регистрацию
+			navigate(isAuth ? '/' : '/register')
 		}, 2000)
-	}, [])
+	}, [navigate, isAuth])
 
 	return (
 		<section className='overflow-y-auto fixed top-1/2 -translate-y-1/2 flex items-center'>
