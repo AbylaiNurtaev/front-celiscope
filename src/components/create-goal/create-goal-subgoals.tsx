@@ -5,6 +5,7 @@ import { UseFormSetValue, UseFormWatch } from 'react-hook-form'
 import Popup from 'reactjs-popup'
 import { Block } from '../ui/block'
 import { Button } from '../ui/button'
+import { CalendarIcon } from 'lucide-react'
 
 export function CreateGoalSubGoal({
 	watch,
@@ -17,10 +18,43 @@ export function CreateGoalSubGoal({
 	const [subGoalDateTemp, setSubGoalDateTemp] = useState<Date | null>()
 	const [subGoalCreateOpen, setSubGoalCreateOpen] = useState<boolean>(false)
 	const [editingIndex, setEditingIndex] = useState<number | null>(null)
+	const [subGoalDateInput, setSubGoalDateInput] = useState<string>('')
 
 	useEffect(() => {
 		setSubGoalCreateOpen(false)
 	}, [watch('subGoals')])
+
+	function formatDateToInputString(date: Date) {
+		const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`)
+		const dd = pad(date.getDate())
+		const mm = pad(date.getMonth() + 1)
+		const yyyy = date.getFullYear()
+		const hh = pad(date.getHours())
+		const min = pad(date.getMinutes())
+		return `${dd}.${mm}.${yyyy} ${hh}:${min}`
+	}
+
+	function parseInputToDate(value: string): Date | null {
+		// Форматы: dd.MM.yyyy HH:mm или dd.MM.yyyy
+		const trimmed = value.trim()
+		if (!trimmed) return null
+		const dateTimeMatch = trimmed.match(/^([0-3]\d)\.([0-1]\d)\.(\d{4})(?:\s+([0-2]\d):([0-5]\d))?$/)
+		if (!dateTimeMatch) return null
+		const [, ddStr, mmStr, yyyyStr, hhStr, minStr] = dateTimeMatch
+		const dd = Number(ddStr)
+		const mm = Number(mmStr) - 1
+		const yyyy = Number(yyyyStr)
+		const hh = hhStr ? Number(hhStr) : 0
+		const min = minStr ? Number(minStr) : 0
+		const d = new Date(yyyy, mm, dd, hh, min, 0, 0)
+		return isNaN(d.getTime()) ? null : d
+	}
+
+	useEffect(() => {
+		if (subGoalDateTemp instanceof Date) {
+			setSubGoalDateInput(formatDateToInputString(subGoalDateTemp))
+		}
+	}, [subGoalDateTemp])
 
 	const handleAddSubGoal = () => {
 		const subGoals = watch('subGoals') || []
@@ -32,7 +66,9 @@ export function CreateGoalSubGoal({
 			},
 		])
 		setSubGoalTemp('')
-		setSubGoalDateTemp(new Date())
+		const now = new Date()
+		setSubGoalDateTemp(now)
+		setSubGoalDateInput(formatDateToInputString(now))
 		setSubGoalCreateOpen(false)
 	}
 
@@ -44,7 +80,9 @@ export function CreateGoalSubGoal({
 	const handleEditSubGoal = (index: number) => {
 		const subGoal = watch('subGoals')[index]
 		setSubGoalTemp(subGoal.description)
-		setSubGoalDateTemp(subGoal.deadline ? new Date(subGoal.deadline) : new Date())
+		const nextDate = subGoal.deadline ? new Date(subGoal.deadline) : new Date()
+		setSubGoalDateTemp(nextDate)
+		setSubGoalDateInput(formatDateToInputString(nextDate))
 		setEditingIndex(index)
 		setSubGoalCreateOpen(true)
 	}
@@ -63,7 +101,9 @@ export function CreateGoalSubGoal({
 		})
 		setValue('subGoals', updatedSubGoals)
 		setSubGoalTemp('')
-		setSubGoalDateTemp(new Date())
+		const now = new Date()
+		setSubGoalDateTemp(now)
+		setSubGoalDateInput(formatDateToInputString(now))
 		setSubGoalCreateOpen(false)
 		setEditingIndex(null)
 	}
@@ -105,7 +145,14 @@ export function CreateGoalSubGoal({
 								contentStyle={{
 									width: '80%',
 								}}
-								onOpen={() => setSubGoalCreateOpen(true)}
+								onOpen={() => {
+									setSubGoalCreateOpen(true)
+									if (!subGoalDateTemp) {
+										const now = new Date()
+										setSubGoalDateTemp(now)
+										setSubGoalDateInput(formatDateToInputString(now))
+									}
+								}}
 								onClose={() => setSubGoalCreateOpen(false)}
 								position='top left'
 								arrow={false}
@@ -131,7 +178,7 @@ export function CreateGoalSubGoal({
 											editingIndex !== null
 												? handleUpdateSubGoal
 												: handleAddSubGoal
-										}
+											}
 										className='aspect-square !p-2 rounded-sm'
 									>
 										<CheckIcon />
@@ -139,22 +186,50 @@ export function CreateGoalSubGoal({
 								</div>
 								<div className='mt-3'>
 									Крайний срок
-									<input
-										type='datetime-local'
-										onKeyDown={e => e.preventDefault()}
-										onChange={e => setSubGoalDateTemp(new Date(e.target.value))}
-										value={
-											subGoalDateTemp
-												? new Date(
-														subGoalDateTemp.getTime() -
-															new Date().getTimezoneOffset() * 60000
-												  )
-														.toISOString()
-														.slice(0, 16)
-												: ''
-										}
-										className='w-full outline-none resize-none border mt-2 p-2 rounded-md border-gray-100'
-									/>
+									<div className='flex items-center gap-2 mt-2'>
+										<input
+											type='text'
+											placeholder='дд.мм.гггг чч:мм'
+											value={subGoalDateInput}
+											onChange={e => setSubGoalDateInput(e.target.value)}
+											onBlur={() => {
+												const d = parseInputToDate(subGoalDateInput)
+												if (d) setSubGoalDateTemp(d)
+											}}
+											className='w-full outline-none resize-none border p-2 rounded-md border-gray-100'
+										/>
+										<Popup
+											trigger={
+												<Button type='button' className='aspect-square !p-2 rounded-md'>
+													<CalendarIcon />
+												</Button>
+											}
+											position='bottom left'
+											arrow={false}
+										>
+											<input
+												type='datetime-local'
+												onChange={e => {
+													const d = new Date(e.target.value)
+													if (!isNaN(d.getTime())) {
+														setSubGoalDateTemp(d)
+														setSubGoalDateInput(formatDateToInputString(d))
+													}
+												}}
+												value={
+													subGoalDateTemp
+														? new Date(
+																subGoalDateTemp.getTime() -
+																	new Date().getTimezoneOffset() * 60000
+															  )
+																.toISOString()
+																.slice(0, 16)
+														: ''
+												}
+												className='w-full outline-none resize-none border p-2 rounded-md border-gray-100'
+											/>
+										</Popup>
+									</div>
 								</div>
 							</Popup>
 						</td>
