@@ -11,7 +11,7 @@ export function CreateGoalPrivacy({
 	const currentPrivacy = watch('privacy')
 
 	return (
-		<Block title='Хотите ли транслировать выполнение цели друзьям?'>
+		<Block title='Хотите ли транслировать выполнение цели друзьям?' >
 			<div className='w-full px-4 flex items-center gap-4 justify-center flex-wrap'>
 				<div className='flex items-center gap-2 text-sm'>
 					<input

@@ -5,9 +5,11 @@ import { goalService } from '../services/goal.service'
 export function useCreateGoal(cb?: () => void) {
 	return useMutation({
 		mutationFn: async ({ data }: { data: any }) => {
-			const { image: _, ...dataWithoutImage } = data
+			const { image, ...dataWithoutImage } = data
 			const formData = new FormData()
-			formData.append('image', data.image)
+			if (image) {
+				formData.append('image', image)
+			}
 			formData.append('info', JSON.stringify(dataWithoutImage))
 			const res = await goalService.createGoal(formData)
 			if (res?.status !== 200) throw new Error()

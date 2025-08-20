@@ -35,7 +35,7 @@ interface Form {
 	privacy: 'PRIVATE' | 'PUBLIC'
 	deadline: '3_MONTHS' | '6_MONTHS' | '1_YEAR'
 	subGoals?: { description: string; deadline: Date }[]
-	image: File
+	image?: File
 }
 
 export function CreateGoal() {
@@ -82,11 +82,6 @@ export function CreateGoal() {
 				onSubmit={handleSubmit(data => {
 					console.log('Form data before cleaning:', data)
 					
-					if (!data.image) {
-						toast.error('Пожалуйста, загрузите фото для цели')
-						return
-					}
-					
 					if (!data.subGoals || data.subGoals.length === 0) {
 						toast.error('Пожалуйста, добавьте хотя бы одну задачу')
 						return
@@ -116,7 +111,7 @@ export function CreateGoal() {
 					<span>Описание цели</span>
 				</div>
 
-				<section className='flex flex-col gap-5 px-4'>
+				<section className='flex flex-col gap-5 px-4 mb-10'>
 					<CreateGoalSpecific register={register} />
 					<CreateGoalMeasurable register={register} />
 					<CreateGoalAttainable register={register} />
@@ -129,7 +124,7 @@ export function CreateGoal() {
 					<CreateGoalPrivacy setValue={setValue} watch={watch} />
 				</section>
 
-				<div className='flex justify-end px-4'>
+				<div className='fixed bottom-0 right-0 px-4 py-3 z-50'>
 					<Button type='submit' className='ml-auto mt-5' disabled={isPending}>
 						{isPending && <LoaderIcon className='animate-spin mr-2' />}
 						{isPending ? 'Сохранение...' : 'Готово'}

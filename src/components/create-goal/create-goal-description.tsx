@@ -12,6 +12,8 @@ export function CreateGoalDescription({
 				<textarea
 					{...register('description')}
 					required
+					maxLength={1000}
+					placeholder='До 1000 символов'
 					className='border-b-1 border-[#2F51A8] w-full h-40 outline-none resize-none'
 				/>
 			</div>
