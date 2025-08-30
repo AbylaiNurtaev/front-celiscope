@@ -181,7 +181,7 @@ export function CreateGoalSubGoal({
 									<textarea
 										onChange={e => setSubGoalTemp(e.target.value)}
 										value={subGoalTemp}
-										placeholder="Введите описание"
+										placeholder="Введите задачу"
 										required
 										className="w-full outline-none resize-none"
 									/>
