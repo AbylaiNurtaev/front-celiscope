@@ -10,8 +10,8 @@ export function HelloPage() {
 		setTimeout(() => {
 			sessionStorage.setItem('helloShown', 'true')
 			// Если пользователь уже авторизован, идем на главную
-			// Иначе на регистрацию
-			navigate(isAuth ? '/' : '/register')
+			// Иначе на логин
+			navigate(isAuth ? '/' : '/login')
 		}, 2000)
 	}, [navigate, isAuth])
 

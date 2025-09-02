@@ -4,7 +4,6 @@ import {
 	RegisterTitle,
 	RegisterUserInfo,
 	RegisterAgreements,
-	RegisterPin,
 	RegisterUsername,
 } from '../components/register'
 import { useAuth } from '../hooks/useAuth'
@@ -12,12 +11,10 @@ import { useNavigate } from 'react-router'
 import { useInitData } from '../hooks/useInitData'
 import { userService } from '../services/user.service'
 import { LoaderIcon } from 'lucide-react'
-import { useAuthStore } from '../store/auth.store'
 
 export function RegisterPage() {
 	const navigate = useNavigate()
 	const initData = useInitData()
-	const { setIsAuth, setUser } = useAuthStore()
 
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -28,21 +25,17 @@ export function RegisterPage() {
 				initData?.user?.id.toString() || ''
 			)
 			if (user.data) {
-				// Пользователь уже существует, авторизуем его
-				setUser(user.data)
-				setIsAuth(true)
-				navigate('/')
+				// Пользователь уже существует, перенаправляем на логин
+				navigate('/login')
 			}
 			setIsLoading(false)
 		}
 
 		checkUserExists()
-	}, [initData, navigate, setUser, setIsAuth])
+	}, [initData, navigate])
 
 	const [personalDataAgreement, setPersonalDataAgreement] =
 		useState<boolean>(true)
-
-	// const [pin, setPin] = useState<string>('')
 
 	const [privacyPolicyAgreement, setPrivacyPolicyAgreement] =
 		useState<boolean>(true)
@@ -55,24 +48,8 @@ export function RegisterPage() {
 
 	const auth = () => {
 		window.scrollTo(0, 0)
-		// Автоматически авторизуем пользователя без PIN-кода
 		if (initData) {
-			// Создаем заглушку пользователя
-			const mockUser = {
-				id: initData.user?.id.toString() || '',
-				firstName: initData.user?.first_name || '',
-				lastName: initData.user?.last_name || '',
-				username: initData.user?.username || '',
-				photoUrl: initData.user?.photo_url || '',
-				inviteCode: 'default', // Добавляем обязательное поле
-				// pin: pin, // Убираем PIN
-			}
-			
-			// Устанавливаем пользователя как авторизованного
-			setUser(mockUser)
-			setIsAuth(true)
-			
-			// Вызываем мутацию для совместимости
+			// Отправляем пустой PIN или заглушку для совместимости с бэкендом
 			mutate({ initData, pin: '0000' })
 		}
 	}
@@ -88,20 +65,25 @@ export function RegisterPage() {
 				privacyPolicyAgreement={privacyPolicyAgreement}
 				setPrivacyPolicyAgreement={setPrivacyPolicyAgreement}
 			/>
-			<RegisterPin />
 
 			<div className='flex w-full justify-center'>
 				<Button
 					onClick={auth}
 					className='mt-10'
 					disabled={
-						// pin.trim().length !== 4 ||
 						!privacyPolicyAgreement ||
 						!personalDataAgreement ||
 						isPending
 					}
 				>
-					Далее
+					{isPending ? (
+						<div className='flex items-center gap-2'>
+							<LoaderIcon className='animate-spin' />
+							<span>Регистрация...</span>
+						</div>
+					) : (
+						'Далее'
+					)}
 				</Button>
 			</div>
 		</section>

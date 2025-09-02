@@ -10,6 +10,9 @@ export function useCreateGoal(cb?: () => void) {
 			if (image) {
 				formData.append('image', image)
 			}
+			
+			// Временно не добавляем userId, так как бэкенд не принимает это поле
+			// TODO: Добавить userId в схему валидации на бэкенде
 			formData.append('info', JSON.stringify(dataWithoutImage))
 			const res = await goalService.createGoal(formData)
 			if (res?.status !== 200) throw new Error()
