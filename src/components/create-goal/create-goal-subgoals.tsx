@@ -1,5 +1,5 @@
 import { CheckIcon, EditIcon, XIcon, Calendar } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { UseFormSetValue, UseFormWatch } from 'react-hook-form'
 
 import Popup from 'reactjs-popup'
@@ -18,7 +18,6 @@ export function CreateGoalSubGoal({
 	const [subGoalCreateOpen, setSubGoalCreateOpen] = useState<boolean>(false)
 	const [editingIndex, setEditingIndex] = useState<number | null>(null)
 	const [manualDateText, setManualDateText] = useState<string>('')
-	const datePickerRef = useRef<HTMLInputElement | null>(null)
 
 	const formatDateToManual = (date: Date): string => {
 		const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`)
@@ -215,29 +214,10 @@ export function CreateGoalSubGoal({
 											}}
 											className='w-4/5 outline-none resize-none border p-2 rounded-md border-gray-100'
 										/>
-										<div className='w-1/5'>
-											<Button
-												type='button'
-												className='!p-2 w-full rounded-md flex items-center justify-center'
-												onClick={() => {
-													const input = datePickerRef.current
-													if (!input) return
-													// Prefer showPicker if available
-													// @ts-ignore
-													if (typeof input.showPicker === 'function') {
-														// @ts-ignore
-														input.showPicker()
-													} else {
-														input.click()
-													}
-												}}
-											>
-												<Calendar size={18} />
-											</Button>
+										<div className='relative w-1/5'>
 											<input
-												ref={datePickerRef}
 												type='datetime-local'
-												className='hidden'
+												className='absolute inset-0 opacity-0 cursor-pointer z-10'
 												onChange={e => {
 													if (e.target.value) {
 														const d = new Date(e.target.value)
@@ -246,6 +226,9 @@ export function CreateGoalSubGoal({
 													}
 												}}
 											/>
+											<Button type='button' className='!p-2 w-full rounded-md flex items-center justify-center pointer-events-none'>
+												<Calendar size={18} />
+											</Button>
 										</div>
 									</div>
 								</div>
