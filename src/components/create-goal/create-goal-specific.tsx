@@ -13,11 +13,10 @@ export function CreateGoalSpecific({
 			title='1. Specific (Конкретность) Объясни, что именно необходимо достигнуть'
 		>
 			<div className='w-full px-4'>
-				<input
+				<textarea
 					{...register('specific')}
 					required
-					type='text'
-					className='border-b-1 border-[#2F51A8] w-full outline-none'
+					className='border-b-1 border-[#2F51A8] w-full outline-none resize-none h-20'
 				/>
 			</div>
 		</Block>

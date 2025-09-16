@@ -20,11 +20,10 @@ export function CreateGoalRelevant({
 			title='4. Relevant (Актуальность) Зачем тебе нужна эта цель?'
 		>
 			<div className='w-full px-4'>
-				<input
-					type='text'
+				<textarea
 					{...register('relevant')}
 					required
-					className='border-b-1 border-[#2F51A8] w-full outline-none'
+					className='border-b-1 border-[#2F51A8] w-full outline-none resize-none h-20'
 				/>
 			</div>
 		</Block>

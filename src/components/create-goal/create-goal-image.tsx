@@ -23,7 +23,7 @@ export function CreateGoalImageField({
 	}, [goal])
 	
 	return (
-		<Block title='Загрузить фото'>
+		<Block title='Загрузить фото (необязательно)'>
 			<div className='w-full px-4'>
 				{currentImageUrl && (
 					<div className="mb-4">

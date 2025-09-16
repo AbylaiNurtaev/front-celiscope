@@ -20,11 +20,10 @@ export function CreateGoalMeasurable({
 			title='2. Measurable (Измеримость) Объясни, в чем будет измеряться результат'
 		>
 			<div className='w-full px-4'>
-				<input
-					type='text'
+				<textarea
 					{...register('measurable')}
 					required
-					className='border-b-1 border-[#2F51A8] w-full outline-none'
+					className='border-b-1 border-[#2F51A8] w-full outline-none resize-none h-20'
 				/>
 			</div>
 		</Block>

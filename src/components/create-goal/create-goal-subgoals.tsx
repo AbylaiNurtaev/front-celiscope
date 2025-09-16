@@ -1,5 +1,5 @@
-import { CheckIcon, EditIcon, XIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { CheckIcon, EditIcon, XIcon, Calendar } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { UseFormSetValue, UseFormWatch } from 'react-hook-form'
 
 import Popup from 'reactjs-popup'
@@ -14,9 +14,51 @@ export function CreateGoalSubGoal({
 	setValue: UseFormSetValue<any>
 }) {
 	const [subGoalTemp, setSubGoalTemp] = useState<string>('')
-	const [subGoalDateTemp, setSubGoalDateTemp] = useState<Date | null>()
+	const [subGoalDateTemp, setSubGoalDateTemp] = useState<Date | null>(new Date())
 	const [subGoalCreateOpen, setSubGoalCreateOpen] = useState<boolean>(false)
 	const [editingIndex, setEditingIndex] = useState<number | null>(null)
+	const [manualDateText, setManualDateText] = useState<string>('')
+	const datePickerRef = useRef<HTMLInputElement | null>(null)
+
+	const formatDateToManual = (date: Date): string => {
+		const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`)
+		const dd = pad(date.getDate())
+		const mm = pad(date.getMonth() + 1)
+		const yyyy = date.getFullYear()
+		const hh = pad(date.getHours())
+		const min = pad(date.getMinutes())
+		return `${dd}:${mm}:${yyyy} ${hh}:${min}`
+	}
+
+	const formatDigitsToManual = (digits: string): string => {
+		let out = ''
+		for (let i = 0; i < digits.length && i < 12; i++) {
+			out += digits[i]
+			if (i === 1 || i === 3) out += ':'
+			if (i === 7) out += ' '
+			if (i === 9) out += ':'
+		}
+		return out
+	}
+
+	const formatManualInput = (raw: string): string => {
+		const digits = raw.replace(/\D/g, '')
+		return formatDigitsToManual(digits)
+	}
+
+	const tryParseManual = (text: string): Date | null => {
+		const m = text.match(/^(\d{2}):(\d{2}):(\d{4}) (\d{2}):(\d{2})$/)
+		if (!m) return null
+		const [, ddStr, mmStr, yyyyStr, hhStr, minStr] = m
+		const dd = Number(ddStr)
+		const mm = Number(mmStr)
+		const yyyy = Number(yyyyStr)
+		const hh = Number(hhStr)
+		const min = Number(minStr)
+		if (mm < 1 || mm > 12 || dd < 1 || dd > 31 || hh > 23 || min > 59) return null
+		const d = new Date(yyyy, mm - 1, dd, hh, min)
+		return isNaN(d.getTime()) ? null : d
+	}
 
 	useEffect(() => {
 		setSubGoalCreateOpen(false)
@@ -28,7 +70,7 @@ export function CreateGoalSubGoal({
 			...subGoals,
 			{
 				description: subGoalTemp,
-				deadline: subGoalDateTemp
+				deadline: subGoalDateTemp || new Date()
 			},
 		])
 		setSubGoalTemp('')
@@ -44,7 +86,9 @@ export function CreateGoalSubGoal({
 	const handleEditSubGoal = (index: number) => {
 		const subGoal = watch('subGoals')[index]
 		setSubGoalTemp(subGoal.description)
-		setSubGoalDateTemp(subGoal.deadline ? new Date(subGoal.deadline) : new Date())
+		const d = subGoal.deadline ? new Date(subGoal.deadline) : new Date()
+		setSubGoalDateTemp(d)
+		setManualDateText(formatDateToManual(d))
 		setEditingIndex(index)
 		setSubGoalCreateOpen(true)
 	}
@@ -62,6 +106,13 @@ export function CreateGoalSubGoal({
 			return subGoal
 		})
 		setValue('subGoals', updatedSubGoals)
+		setSubGoalTemp('')
+		setSubGoalDateTemp(new Date())
+		setSubGoalCreateOpen(false)
+		setEditingIndex(null)
+	}
+
+	const handleCloseSubGoal = () => {
 		setSubGoalTemp('')
 		setSubGoalDateTemp(new Date())
 		setSubGoalCreateOpen(false)
@@ -106,7 +157,7 @@ export function CreateGoalSubGoal({
 									width: '80%',
 								}}
 								onOpen={() => setSubGoalCreateOpen(true)}
-								onClose={() => setSubGoalCreateOpen(false)}
+								onClose={handleCloseSubGoal}
 								position='top left'
 								arrow={false}
 								trigger={
@@ -120,8 +171,9 @@ export function CreateGoalSubGoal({
 							>
 								<div className='w-full flex items-center gap-2'>
 									<textarea
+										value={subGoalTemp}
 										onChange={e => setSubGoalTemp(e.target.value)}
-										placeholder='Введите описание'
+										placeholder='Введите задачу'
 										required
 										className='w-full outline-none resize-none'
 									/>
@@ -139,22 +191,63 @@ export function CreateGoalSubGoal({
 								</div>
 								<div className='mt-3'>
 									Крайний срок
-									<input
-										type='datetime-local'
-										onKeyDown={e => e.preventDefault()}
-										onChange={e => setSubGoalDateTemp(new Date(e.target.value))}
-										value={
-											subGoalDateTemp
-												? new Date(
-														subGoalDateTemp.getTime() -
-															new Date().getTimezoneOffset() * 60000
-												  )
-														.toISOString()
-														.slice(0, 16)
-												: ''
-										}
-										className='w-full outline-none resize-none border mt-2 p-2 rounded-md border-gray-100'
-									/>
+									<div className='flex items-center gap-2 mt-2'>
+										<input
+											type='text'
+											placeholder='ДД:ММ:ГГГГ ЧЧ:ММ'
+											value={manualDateText}
+											onChange={e => {
+												const formatted = formatManualInput(e.target.value)
+												setManualDateText(formatted)
+												const parsed = tryParseManual(formatted)
+												if (parsed) setSubGoalDateTemp(parsed)
+											}}
+											onKeyDown={e => {
+												if (e.key === 'Backspace' && manualDateText) {
+													e.preventDefault()
+													const digits = manualDateText.replace(/\D/g, '')
+													const nextDigits = digits.slice(0, -1)
+													const nextFormatted = formatDigitsToManual(nextDigits)
+													setManualDateText(nextFormatted)
+													const parsed = tryParseManual(nextFormatted)
+													if (parsed) setSubGoalDateTemp(parsed)
+												}
+											}}
+											className='w-4/5 outline-none resize-none border p-2 rounded-md border-gray-100'
+										/>
+										<div className='w-1/5'>
+											<Button
+												type='button'
+												className='!p-2 w-full rounded-md flex items-center justify-center'
+												onClick={() => {
+													const input = datePickerRef.current
+													if (!input) return
+													// Prefer showPicker if available
+													// @ts-ignore
+													if (typeof input.showPicker === 'function') {
+														// @ts-ignore
+														input.showPicker()
+													} else {
+														input.click()
+													}
+												}}
+											>
+												<Calendar size={18} />
+											</Button>
+											<input
+												ref={datePickerRef}
+												type='datetime-local'
+												className='hidden'
+												onChange={e => {
+													if (e.target.value) {
+														const d = new Date(e.target.value)
+														setSubGoalDateTemp(d)
+														setManualDateText(formatDateToManual(d))
+													}
+												}}
+											/>
+										</div>
+									</div>
 								</div>
 							</Popup>
 						</td>

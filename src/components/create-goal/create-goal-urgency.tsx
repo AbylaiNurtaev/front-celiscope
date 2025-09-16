@@ -26,7 +26,7 @@ export function CreateGoalUrgency({
 						onClick={() => setValue('urgencyLevel', 'LOW')}
 						className='text-sm'
 					>
-						Желаймая
+						Желаемая
 					</span>
 				</div>
 				<div className='flex items-center gap-2'>

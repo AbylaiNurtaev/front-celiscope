@@ -35,7 +35,7 @@ interface Form {
 	privacy: 'PRIVATE' | 'PUBLIC'
 	deadline: '3_MONTHS' | '6_MONTHS' | '1_YEAR'
 	subGoals?: { description: string; deadline: Date }[]
-	image: File
+	image?: File
 }
 
 export function CreateGoal() {
@@ -71,7 +71,7 @@ export function CreateGoal() {
 	})
 
 	return (
-		<section className='relative pb-4'>
+		<section className='relative pb-20'>
 			<Link to='/' className='p-3 flex justify-end'>
 				<HomeIcon />
 			</Link>
@@ -81,11 +81,6 @@ export function CreateGoal() {
 			<form
 				onSubmit={handleSubmit(data => {
 					console.log('Form data before cleaning:', data)
-					
-					if (!data.image) {
-						toast.error('Пожалуйста, загрузите фото для цели')
-						return
-					}
 					
 					if (!data.subGoals || data.subGoals.length === 0) {
 						toast.error('Пожалуйста, добавьте хотя бы одну задачу')
@@ -128,14 +123,41 @@ export function CreateGoal() {
 					<CreateGoalImageField watch={watch} setValue={setValue} />
 					<CreateGoalPrivacy setValue={setValue} watch={watch} />
 				</section>
-
-				<div className='flex justify-end px-4'>
-					<Button type='submit' className='ml-auto mt-5' disabled={isPending}>
-						{isPending && <LoaderIcon className='animate-spin mr-2' />}
-						{isPending ? 'Сохранение...' : 'Готово'}
-					</Button>
-				</div>
 			</form>
+			
+			{/* Фиксированная кнопка внизу */}
+			<div className='fixed flex justify-end bottom-0 left-0 right-0  p-4 z-10'>
+				<Button 
+					type='submit' 
+					className='' 
+					disabled={isPending}
+					onClick={handleSubmit(data => {
+						console.log('Form data before cleaning:', data)
+						
+						if (!data.subGoals || data.subGoals.length === 0) {
+							toast.error('Пожалуйста, добавьте хотя бы одну задачу')
+							return
+						}
+						
+						const cleanedData = {
+							...data,
+							description: data.description,
+							award: data.award ? `Награда: ${data.award}` : undefined,
+							subGoals: data.subGoals?.map(subGoal => ({
+								description: subGoal.description,
+								deadline: subGoal.deadline
+							}))
+						}
+						console.log('Cleaned data to send:', cleanedData)
+						createGoal({
+							data: cleanedData
+						})
+					})}
+				>
+					{isPending && <LoaderIcon className='animate-spin mr-2' />}
+					{isPending ? 'Сохранение...' : 'Готово'}
+				</Button>
+			</div>
 		</section>
 	)
 }
