@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { goalService } from '../services/goal.service'
+import { useAuthStore } from '../store/auth.store'
+import { getAccessToken } from '../services/auth/auth.helper'
 
 export function useCreateGoal(cb?: () => void) {
 	return useMutation({
@@ -21,6 +23,8 @@ export function useCreateGoal(cb?: () => void) {
 }
 
 export function useGetGoals() {
+	const { isAuth } = useAuthStore()
+	const hasToken = !!getAccessToken()
 	return useQuery({
 		queryKey: ['get goals'],
 		queryFn: async () => {
@@ -30,6 +34,7 @@ export function useGetGoals() {
 		},
 		refetchOnWindowFocus: false,
 		staleTime: Infinity,
+		enabled: isAuth && hasToken,
 	})
 }
 
@@ -72,6 +77,8 @@ export function useCompleteGoal(id: number) {
 }
 
 export function useGetGoal(id: number) {
+	const { isAuth } = useAuthStore()
+	const hasToken = !!getAccessToken()
 	return useQuery({
 		queryKey: ['get goal', id],
 		queryFn: async () => {
@@ -80,6 +87,7 @@ export function useGetGoal(id: number) {
 			return res.data // <--- ВАЖНО!
 		},
 		refetchOnWindowFocus: false,
+		enabled: isAuth && hasToken,
 	})
 }
 

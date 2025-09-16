@@ -40,9 +40,11 @@ api.interceptors.response.use(
 		}
 
 		if (error) {
-			const message = error.response.data.message
-			if (!error.response.request.responseURL.includes('refresh'))
+			const status = error?.response?.status
+			if (status !== 401 && status !== 403) {
+				const message = error?.response?.data?.message || 'Неизвестная ошибка'
 				toast.error(message)
+			}
 		} else if (
 			error?.response?.status !== 401 &&
 			error?.response?.status !== 403
