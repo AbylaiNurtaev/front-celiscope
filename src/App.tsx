@@ -43,7 +43,7 @@ function App() {
 
 	useEffect(() => {
 		if (!isAuth && !PAGES_WITHOUT_AUTH.includes(location.pathname))
-			navigate('/register')
+			navigate('/')
 	}, [isAuth, location.pathname])
 
 	useEffect(() => {

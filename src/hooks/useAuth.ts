@@ -3,13 +3,13 @@ import { useMutation } from '@tanstack/react-query'
 import { InitData } from '@telegram-apps/sdk'
 import { toast } from 'react-hot-toast'
 
-export function useAuth(successCallback?: () => void) {
+export function useAuth(successCallback?: () => void, showToast: boolean = true) {
 	return useMutation({
 		mutationFn: async (data: { initData: InitData }) => {
 			return await authService.auth(data)
 		},
 		onSuccess: () => {
-			toast.success('Успешно!')
+			if (showToast) toast.success('Успешно!')
 			successCallback?.()
 		},
 	})
