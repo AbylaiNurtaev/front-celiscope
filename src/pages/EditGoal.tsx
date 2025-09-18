@@ -113,7 +113,7 @@ export function EditGoal() {
 	})
 
 	return (
-		<section className='relative pb-4'>
+		<section className='relative pb-20'>
 			<Link to='/' className='p-3 flex justify-end'>
 				<HomeIcon />
 			</Link>
@@ -170,14 +170,41 @@ export function EditGoal() {
 					<CreateGoalImageField watch={watch} setValue={setValue} />
 					<CreateGoalPrivacy setValue={setValue} watch={watch} />
 				</section>
-
-				<div className='flex justify-end px-4'>
-					<Button type='submit' className='ml-auto mt-5' disabled={isPending}>
-						{isPending && <LoaderIcon className='animate-spin mr-2' />}
-						{isPending ? 'Сохранение...' : 'Готово'}
-					</Button>
-				</div>
 			</form>
+
+			{/* Фиксированная кнопка внизу */}
+			<div className='fixed flex justify-end bottom-0 left-0 right-0  p-4 z-10'>
+				<Button
+					type='submit'
+					className=''
+					disabled={isPending}
+					onClick={handleSubmit(data => {
+						const { currentGoal, ...dataWithoutCurrentGoal } = data
+						if (!dataWithoutCurrentGoal.image && !watch('currentGoal')?.imageUrl) {
+							toast.error('Пожалуйста, загрузите фото для цели')
+							return
+						}
+						if (!dataWithoutCurrentGoal.subGoals || dataWithoutCurrentGoal.subGoals.length === 0) {
+							toast.error('Пожалуйста, добавьте хотя бы одну задачу')
+							return
+						}
+						const cleanedData = {
+							...dataWithoutCurrentGoal,
+							deadline: dataWithoutCurrentGoal.deadline || '3_MONTHS',
+							privacy: dataWithoutCurrentGoal.privacy || 'PRIVATE',
+							award: dataWithoutCurrentGoal.award,
+							subGoals: dataWithoutCurrentGoal.subGoals?.map(subGoal => ({
+								description: subGoal.description,
+								deadline: new Date(subGoal.deadline)
+							}))
+						}
+						updateGoal({ data: cleanedData })
+					})}
+				>
+					{isPending && <LoaderIcon className='animate-spin mr-2' />}
+					{isPending ? 'Сохранение...' : 'Готово'}
+				</Button>
+			</div>
 		</section>
 	)
 } 
