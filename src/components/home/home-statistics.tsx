@@ -37,21 +37,12 @@ export function HomeStatistics() {
 					percent = Math.round((completedSubGoals / totalSubGoals) * 100)
 				}
 				
-				// Отладочная информация
-				console.log(`Цель ${index + 1}: "${goal.title}"`, {
-					totalSubGoals,
-					completedSubGoals,
-					percent,
-					subGoals: goal.subGoals?.map(sub => ({ description: sub.description, isCompleted: sub.isCompleted }))
-				})
-					
 				return {
 					name: `№${index + 1}`,
 					percent
 				}
 			})
 			
-		console.log('Данные для графика:', data)
 		return data
 	}, [goalsData])
 	

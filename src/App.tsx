@@ -18,7 +18,6 @@ import { friendshipService } from './services/friendship.service'
 const PAGES_WITHOUT_AUTH = [
 	'/register',
 	'/hello',
-	'/login',
 	'/privacy-policy',
 	'/personal-data-agreement',
 ]
@@ -85,12 +84,10 @@ function App() {
 		createFriendship()
 	}, [isAuth])
 
-	useEffect(() => {
-		if (!isInitializing && !isAuth && !PAGES_WITHOUT_AUTH.includes(location.pathname))
-			navigate('/login')
-	}, [isAuth, location.pathname, isInitializing])
+	// Убираем принудительное перенаправление на /login
+	// Пользователи всегда могут видеть главную страницу
 
-	// Перенаправляем на главную страницу после успешной аутентификации
+	// Перенаправляем на главную страницу после успешной аутентификации только с страниц логина и регистрации
 	useEffect(() => {
 		if (isAuth && (location.pathname === '/login' || location.pathname === '/register')) {
 			navigate('/')

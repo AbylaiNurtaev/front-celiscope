@@ -33,11 +33,11 @@ export function HomePage() {
 				if (res?.data) {
 					if (!initData) return
 					auth({ initData: initData })
-				} else {
-					navigate('/register')
 				}
+				// Убираем принудительное перенаправление на /register
+				// Пользователь может остаться на главной странице
 			} catch {
-				// В случае ошибки просто остаёмся на странице; /register покроет неавторизованных
+				// В случае ошибки просто остаёмся на странице
 			} finally {
 				setBootstrapping(false)
 			}
@@ -56,8 +56,22 @@ export function HomePage() {
 				</Link>
 			</div>
 			<HomeStatistics />
-			{isAuth && <HomeList />}
-			<HomeCreateGoal className='fixed bottom-5 right-5 [&_button]:aspect-square [&_button]:px-3 [&_button]:py-1 text-4xl [&_button]:flex [&_button]:items-center [&_button]:justify-center' />
+			{isAuth ? (
+				<HomeList />
+			) : (
+				<div className='flex flex-col items-center justify-center py-8 px-4'>
+					<h3 className='text-lg font-semibold mb-4 text-center'>
+						Добро пожаловать! Для начала работы зарегистрируйтесь
+					</h3>
+					<Link 
+						to='/register' 
+						className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors'
+					>
+						Зарегистрироваться
+					</Link>
+				</div>
+			)}
+			{isAuth && <HomeCreateGoal className='fixed bottom-5 right-5 [&_button]:aspect-square [&_button]:px-3 [&_button]:py-1 text-4xl [&_button]:flex [&_button]:items-center [&_button]:justify-center' />}
 		</section>
 	)
 }
