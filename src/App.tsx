@@ -1,6 +1,8 @@
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuthStore } from './store/auth.store'
+import { useInitData } from './hooks/useInitData'
+import { useAuth, useRefresh } from './hooks/useAuth'
 
 import { SettingsPage } from './pages/SettingsPage'
 import { PrivacyPolicyPage } from './pages/PrivacyPolicy'
@@ -25,6 +27,48 @@ function App() {
 	const { isAuth } = useAuthStore()
 	const location = useLocation()
 	const navigate = useNavigate()
+	const initData = useInitData()
+	const [isInitializing, setIsInitializing] = useState(true)
+	
+	const authMutation = useAuth(() => {
+		setIsInitializing(false)
+	}, false)
+	
+	const refreshMutation = useRefresh()
+
+	// Автоматическая аутентификация при инициализации
+	useEffect(() => {
+		const initializeAuth = async () => {
+			// Сначала проверяем, есть ли сохраненный токен
+			const token = localStorage.getItem('accessToken')
+			if (token && !isAuth) {
+				// Пытаемся обновить токен
+				try {
+					await refreshMutation.mutateAsync()
+				} catch (error) {
+					console.error('Ошибка обновления токена:', error)
+					// Если токен недействителен, пробуем авторизоваться заново
+					if (initData) {
+						try {
+							await authMutation.mutateAsync({ initData })
+						} catch (authError) {
+							console.error('Ошибка автоматической аутентификации:', authError)
+						}
+					}
+				}
+			} else if (initData && !isAuth) {
+				// Если нет токена, но есть данные Telegram, авторизуемся
+				try {
+					await authMutation.mutateAsync({ initData })
+				} catch (error) {
+					console.error('Ошибка автоматической аутентификации:', error)
+				}
+			}
+			setIsInitializing(false)
+		}
+
+		initializeAuth()
+	}, [initData, isAuth])
 
 	useEffect(() => {
 		const inviteCode = window?.Telegram?.WebApp?.initDataUnsafe?.start_param
@@ -42,13 +86,32 @@ function App() {
 	}, [isAuth])
 
 	useEffect(() => {
-		if (!isAuth && !PAGES_WITHOUT_AUTH.includes(location.pathname))
+		if (!isInitializing && !isAuth && !PAGES_WITHOUT_AUTH.includes(location.pathname))
+			navigate('/login')
+	}, [isAuth, location.pathname, isInitializing])
+
+	// Перенаправляем на главную страницу после успешной аутентификации
+	useEffect(() => {
+		if (isAuth && (location.pathname === '/login' || location.pathname === '/register')) {
 			navigate('/')
-	}, [isAuth, location.pathname])
+		}
+	}, [isAuth, location.pathname, navigate])
 
 	useEffect(() => {
 		if (sessionStorage.getItem('helloShown') !== 'true') navigate('/hello')
 	}, [sessionStorage.getItem('helloShown')])
+
+	// Показываем загрузку во время инициализации
+	if (isInitializing) {
+		return (
+			<div className="flex items-center justify-center min-h-screen bg-gray-50">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+					<p className="text-gray-600">Загрузка...</p>
+				</div>
+			</div>
+		)
+	}
 
 	return (
 		<Routes>

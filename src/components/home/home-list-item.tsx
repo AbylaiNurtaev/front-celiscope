@@ -18,9 +18,9 @@ export const URGENCY_COLORS = {
 }
 
 export function HomeListItem({ goal, index }: Props) {
-	const isSubGoalsCompleted = goal.subGoals?.every(
-		subGoal => subGoal.isCompleted
-	)
+	const isSubGoalsCompleted = goal.subGoals && goal.subGoals.length > 0 
+		? goal.subGoals.every(subGoal => subGoal.isCompleted)
+		: true // Если нет подзадач, считаем цель выполненной
 
 	const { isCompleted } = goal
 

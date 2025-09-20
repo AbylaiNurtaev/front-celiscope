@@ -19,7 +19,7 @@ export function HomeStatistics() {
 		if (!goalsData?.data) return []
 		
 		// Фильтруем незавершенные цели и сортируем по дате создания (новые сверху)
-		return goalsData.data
+		const data = goalsData.data
 			.filter((goal: Goal) => !goal.isCompleted)
 			.sort((a: Goal, b: Goal) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 			.slice(0, 10)
@@ -27,15 +27,32 @@ export function HomeStatistics() {
 				// Вычисляем процент выполнения на основе подцелей
 				const totalSubGoals = goal.subGoals?.length || 0
 				const completedSubGoals = goal.subGoals?.filter(sub => sub.isCompleted).length || 0
-				const percent = totalSubGoals > 0 
-					? Math.round((completedSubGoals / totalSubGoals) * 100) 
-					: 0
+				
+				let percent: number
+				if (totalSubGoals === 0) {
+					// Если у цели нет подзадач, считаем её выполненной на 100%
+					percent = 100
+				} else {
+					// Если есть подзадачи, вычисляем процент выполнения
+					percent = Math.round((completedSubGoals / totalSubGoals) * 100)
+				}
+				
+				// Отладочная информация
+				console.log(`Цель ${index + 1}: "${goal.title}"`, {
+					totalSubGoals,
+					completedSubGoals,
+					percent,
+					subGoals: goal.subGoals?.map(sub => ({ description: sub.description, isCompleted: sub.isCompleted }))
+				})
 					
 				return {
 					name: `№${index + 1}`,
 					percent
 				}
 			})
+			
+		console.log('Данные для графика:', data)
+		return data
 	}, [goalsData])
 	
 	// Подготавливаем данные для графика выполненных задач по месяцам
@@ -89,7 +106,7 @@ export function HomeStatistics() {
 							</span>
 						</div>
 						<ResponsiveContainer height={120} className='-ml-5'>
-							<BarChart height={120} data={barChartData}>
+							<BarChart height={120} data={barChartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
 								<defs>
 									<linearGradient
 										id='gradient1'
@@ -104,7 +121,13 @@ export function HomeStatistics() {
 								</defs>
 
 								<XAxis dataKey='name' fontSize={12} />
-								<YAxis dataKey='percent' fontSize={12} max={100} min={0} tickFormatter={(value) => `${value}%`} />
+								<YAxis 
+									dataKey='percent' 
+									fontSize={12} 
+									domain={[0, 100]} 
+									ticks={[0, 25, 50, 75, 100]}
+									tickFormatter={(value) => `${value}%`} 
+								/>
 								<Bar dataKey='percent' fill='url(#gradient1)' />
 							</BarChart>
 						</ResponsiveContainer>
