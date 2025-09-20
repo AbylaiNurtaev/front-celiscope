@@ -24,7 +24,7 @@ export function RegisterPage() {
 			const user = await userService.getUser(
 				initData?.user?.id.toString() || ''
 			)
-			if (user.data) navigate('/login')
+			if (user.data) navigate('/')
 			setIsLoading(false)
 		}
 

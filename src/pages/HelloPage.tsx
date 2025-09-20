@@ -7,7 +7,7 @@ export function HelloPage() {
 	useEffect(() => {
 		setTimeout(() => {
 			sessionStorage.setItem('helloShown', 'true')
-			navigate('/login')
+			navigate('/')
 		}, 2000)
 	}, [])
 
