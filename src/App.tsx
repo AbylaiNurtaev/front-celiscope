@@ -15,12 +15,6 @@ import { CreateGoal } from './pages/CreateGoal'
 import { EditGoal } from './pages/EditGoal'
 import { friendshipService } from './services/friendship.service'
 
-const PAGES_WITHOUT_AUTH = [
-	'/register',
-	'/hello',
-	'/privacy-policy',
-	'/personal-data-agreement',
-]
 
 function App() {
 	const { isAuth } = useAuthStore()

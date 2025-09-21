@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { HomeCreateGoal } from '../components/home/home-create-goal'
 import { HomeList } from '../components/home/home-list'
 import { HomeStatistics } from '../components/home/home-statistics'
@@ -12,7 +12,6 @@ import { useAuth } from '../hooks/useAuth'
 export function HomePage() {
 	const { isAuth } = useAuthStore()
 	const initData = useInitData()
-	const navigate = useNavigate()
 	const { mutate: auth } = useAuth(undefined, false)
 	const [bootstrapping, setBootstrapping] = useState<boolean>(true)
 

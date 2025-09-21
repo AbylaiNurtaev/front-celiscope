@@ -78,8 +78,6 @@ export function HomeStatistics() {
 	// Подсчитываем общее количество целей
 	const totalGoals = goalsData?.data?.length || 0
 	
-	// Подсчитываем количество выполненных целей
-	const completedGoals = goalsData?.data?.filter((goal: Goal) => goal.isCompleted).length || 0
 
 	// Подсчитываем общее количество выполненных подзадач
 	const totalCompletedSubGoals = useMemo(() => {
