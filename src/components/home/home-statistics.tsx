@@ -12,7 +12,7 @@ import { Goal } from '../../types/goal'
 import { useMemo } from 'react'
 
 export function HomeStatistics() {
-	const { data: goalsData } = useGetGoals()
+	const { data: goalsData, isLoading, error } = useGetGoals()
 	
 	// Подготавливаем данные для графика прогресса целей
 	const barChartData = useMemo(() => {
@@ -46,7 +46,7 @@ export function HomeStatistics() {
 		return data
 	}, [goalsData])
 	
-	// Подготавливаем данные для графика выполненных задач по месяцам
+	// Подготавливаем данные для графика выполненных подзадач по месяцам
 	const lineChartData = useMemo(() => {
 		if (!goalsData?.data) return []
 		
@@ -57,14 +57,18 @@ export function HomeStatistics() {
 		]
 		
 		// Инициализируем данные для каждого месяца
-		const monthlyData = months.map(name => ({ name, goals: 0 }))
+		const monthlyData = months.map(name => ({ name, subGoals: 0 }))
 		
-		// Подсчитываем выполненные цели по месяцам
+		// Подсчитываем выполненные подзадачи по месяцам
 		goalsData.data.forEach((goal: Goal) => {
-			if (goal.isCompleted && goal.completedAt) {
-				const completedDate = new Date(goal.completedAt)
-				const monthIndex = completedDate.getMonth()
-				monthlyData[monthIndex].goals++
+			if (goal.subGoals) {
+				goal.subGoals.forEach(subGoal => {
+					if (subGoal.isCompleted && subGoal.completedAt) {
+						const completedDate = new Date(subGoal.completedAt)
+						const monthIndex = completedDate.getMonth()
+						monthlyData[monthIndex].subGoals++
+					}
+				})
 			}
 		})
 		
@@ -76,6 +80,73 @@ export function HomeStatistics() {
 	
 	// Подсчитываем количество выполненных целей
 	const completedGoals = goalsData?.data?.filter((goal: Goal) => goal.isCompleted).length || 0
+
+	// Подсчитываем общее количество выполненных подзадач
+	const totalCompletedSubGoals = useMemo(() => {
+		if (!goalsData?.data) return 0
+		return goalsData.data.reduce((total: number, goal: Goal) => {
+			const completedSubGoals = goal.subGoals?.filter(sub => sub.isCompleted).length || 0
+			return total + completedSubGoals
+		}, 0)
+	}, [goalsData])
+
+	// Показываем индикатор загрузки
+	if (isLoading) {
+		return (
+			<section className='font-bold text-lg w-full pt-2 px-4'>
+				<div className='relative p-[3px] rounded-xl'>
+					<div
+						className='absolute inset-0 rounded-lg'
+						style={{
+							background: 'linear-gradient(90deg, #2F51A8 0%, #122042 100%)',
+						}}
+					/>
+					<div className='relative bg-white rounded-md p-8 text-center'>
+						<div className='text-lg'>Загрузка статистики...</div>
+					</div>
+				</div>
+			</section>
+		)
+	}
+
+	// Показываем ошибку
+	if (error) {
+		return (
+			<section className='font-bold text-lg w-full pt-2 px-4'>
+				<div className='relative p-[3px] rounded-xl'>
+					<div
+						className='absolute inset-0 rounded-lg'
+						style={{
+							background: 'linear-gradient(90deg, #2F51A8 0%, #122042 100%)',
+						}}
+					/>
+					<div className='relative bg-white rounded-md p-8 text-center'>
+						<div className='text-lg text-red-600'>Ошибка загрузки данных</div>
+					</div>
+				</div>
+			</section>
+		)
+	}
+
+	// Показываем сообщение, если нет данных
+	if (!goalsData?.data || goalsData.data.length === 0) {
+		return (
+			<section className='font-bold text-lg w-full pt-2 px-4'>
+				<div className='relative p-[3px] rounded-xl'>
+					<div
+						className='absolute inset-0 rounded-lg'
+						style={{
+							background: 'linear-gradient(90deg, #2F51A8 0%, #122042 100%)',
+						}}
+					/>
+					<div className='relative bg-white rounded-md p-8 text-center'>
+						<div className='text-lg'>Нет данных для отображения</div>
+						<div className='text-sm text-gray-500 mt-2'>Создайте первую цель, чтобы увидеть статистику</div>
+					</div>
+				</div>
+			</section>
+		)
+	}
 
 	return (
 		<section className='font-bold text-lg w-full pt-2 px-4'>
@@ -96,45 +167,57 @@ export function HomeStatistics() {
 								Прогресс целей | <span className='font-bold'>ТОП {Math.min(10, goalsData?.data?.filter((goal: Goal) => !goal.isCompleted).length || 0)}</span>
 							</span>
 						</div>
-						<ResponsiveContainer height={120} className='-ml-5'>
-							<BarChart height={120} data={barChartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-								<defs>
-									<linearGradient
-										id='gradient1'
-										x1='0%'
-										y1='0%'
-										x2='0%'
-										y2='100%'
-									>
-										<stop offset='0%' stopColor='#2F51A8' stopOpacity={1} />
-										<stop offset='100%' stopColor='#122042' stopOpacity={1} />
-									</linearGradient>
-								</defs>
+						{barChartData.length > 0 ? (
+							<ResponsiveContainer height={120} className='-ml-5'>
+								<BarChart height={120} data={barChartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+									<defs>
+										<linearGradient
+											id='gradient1'
+											x1='0%'
+											y1='0%'
+											x2='0%'
+											y2='100%'
+										>
+											<stop offset='0%' stopColor='#2F51A8' stopOpacity={1} />
+											<stop offset='100%' stopColor='#122042' stopOpacity={1} />
+										</linearGradient>
+									</defs>
 
-								<XAxis dataKey='name' fontSize={12} />
-								<YAxis 
-									dataKey='percent' 
-									fontSize={12} 
-									domain={[0, 100]} 
-									ticks={[0, 25, 50, 75, 100]}
-									tickFormatter={(value) => `${value}%`} 
-								/>
-								<Bar dataKey='percent' fill='url(#gradient1)' />
-							</BarChart>
-						</ResponsiveContainer>
+									<XAxis dataKey='name' fontSize={12} />
+									<YAxis 
+										dataKey='percent' 
+										fontSize={12} 
+										domain={[0, 100]} 
+										ticks={[0, 25, 50, 75, 100]}
+										tickFormatter={(value) => `${value}%`} 
+									/>
+									<Bar dataKey='percent' fill='url(#gradient1)' />
+								</BarChart>
+							</ResponsiveContainer>
+						) : (
+							<div className='h-[120px] flex items-center justify-center text-gray-500'>
+								Нет активных целей для отображения
+							</div>
+						)}
 					</div>
 					<div className='relative flex flex-col p-2'>
 						<span className='font-normal text-sm text-nowrap'>
-							Выполненные задачи: <span className='font-bold'>{completedGoals}</span>
+							Выполненные подзадачи: <span className='font-bold'>{totalCompletedSubGoals}</span>
 						</span>
 						<div className='w-full'>
-							<ResponsiveContainer height={120} className='mt-4 -ml-6'>
-								<LineChart height={120} data={lineChartData}>
-									<XAxis dataKey='name' fontSize={10} />
-									<YAxis dataKey='goals' fontSize={12} />
-									<Line dataKey='goals' dot={false} />
-								</LineChart>
-							</ResponsiveContainer>
+							{lineChartData.some(item => item.subGoals > 0) ? (
+								<ResponsiveContainer height={120} className='mt-4 -ml-6'>
+									<LineChart height={120} data={lineChartData}>
+										<XAxis dataKey='name' fontSize={10} />
+										<YAxis dataKey='subGoals' fontSize={12} />
+										<Line dataKey='subGoals' dot={false} stroke='#2F51A8' strokeWidth={2} />
+									</LineChart>
+								</ResponsiveContainer>
+							) : (
+								<div className='h-[120px] flex items-center justify-center text-gray-500 mt-4'>
+									Нет выполненных подзадач для отображения
+								</div>
+							)}
 						</div>
 					</div>
 				</div>
