@@ -1,15 +1,13 @@
 type Listener = (message: string) => void;
 
 class NotifyBus {
-  private listeners: Set<Listener> = new Set();
-
-  subscribe(listener: Listener): () => void {
+  subscribe(_listener: Listener): () => void {
     // this.listeners.add(listener);
     // return () => this.listeners.delete(listener);
     return () => {};
   }
 
-  show(message: string) {
+  show(_message: string) {
     // for (const listener of this.listeners) listener(message);
   }
 }

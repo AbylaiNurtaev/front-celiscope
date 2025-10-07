@@ -10,10 +10,9 @@ import { userService } from "../services/user.service";
 import { useAuth } from "../hooks/useAuth";
 import { aiService } from "@/services/ai.service";
 import { Block } from "@/components/ui/block";
-import { Button } from "@/components/ui/button";
 
 export function HomePage() {
-  const { isAuth, user } = useAuthStore();
+  const { isAuth } = useAuthStore();
   const initData = useInitData();
   const { mutate: auth } = useAuth(undefined, false);
   const [bootstrapping, setBootstrapping] = useState<boolean>(true);

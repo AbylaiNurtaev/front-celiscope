@@ -1,26 +1,16 @@
 import clsx from "clsx";
 import { SubGoal } from "../../types/goal";
-import { aiService } from "../../services/ai.service";
-import { notify } from "../../lib/notify";
 import { useCompleteSubGoal, useUncompleteSubGoal } from "../../hooks/useGoal";
 import { useState, useEffect } from "react";
 
 interface Props {
   subGoal: SubGoal;
   index: number;
-  goalTitle: string;
-  total: number;
-  completedCount: number;
-  onAllTasksCompleted?: () => void;
 }
 
 export function HomeSubGoal({
   subGoal,
   index,
-  goalTitle,
-  total,
-  completedCount,
-  onAllTasksCompleted,
 }: Props) {
   const { mutate: complete } = useCompleteSubGoal(subGoal.id);
   const { mutate: uncomplete } = useUncompleteSubGoal(subGoal.id);

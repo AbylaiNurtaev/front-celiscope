@@ -3,17 +3,13 @@ import { Button } from "../ui/button";
 import { DialogContext } from "../ui/dialog";
 import { useCompleteGoal } from "../../hooks/useGoal";
 import { AchievementPopup } from "../AchievementPopup";
-import { aiService } from "../../services/ai.service";
-import { notify } from "../../lib/notify";
 
 export function HomeCompleteGoal({
   goalId,
   award,
-  goalTitle,
 }: {
   goalId: number;
   award?: string;
-  goalTitle: string;
 }) {
   const dialogContextValues = useContext(DialogContext);
   const closeDialog = dialogContextValues?.closeDialog;

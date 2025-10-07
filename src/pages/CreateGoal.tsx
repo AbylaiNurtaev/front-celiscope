@@ -20,7 +20,6 @@ import {
   CreateGoalImageField,
 } from "../components/create-goal";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { aiService } from "@/services/ai.service";
@@ -232,12 +231,12 @@ function TemplateGoalGenerator({
                 : deadlineEnum === "1_YEAR"
                 ? "1 год"
                 : undefined;
-            const maxItems =
-              deadlineEnum === "1_YEAR"
-                ? 12
-                : deadlineEnum === "6_MONTHS"
-                ? 10
-                : 6;
+            // const maxItems =
+            //   deadlineEnum === "1_YEAR"
+            //     ? 12
+            //     : deadlineEnum === "6_MONTHS"
+            //     ? 10
+            //     : 6;
             const resp = await aiService.generateGoalFromTemplate({
               template: watch("template")!,
               deadline,

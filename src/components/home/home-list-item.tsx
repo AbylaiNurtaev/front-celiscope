@@ -5,8 +5,6 @@ import { HomeSubGoal } from "./home-sub-goal";
 import { HomeCompleteGoal } from "./home-complete-goal";
 import { CheckIcon } from "lucide-react";
 import { Link } from "react-router";
-import { aiService } from "../../services/ai.service";
-import { notify } from "../../lib/notify";
 
 interface Props {
   goal: Goal;
@@ -33,16 +31,16 @@ export function HomeListItem({ goal, index }: Props) {
     (subGoal) => !subGoal.isCompleted && new Date(subGoal.deadline) < new Date()
   );
 
-  const handleAllTasksCompleted = async () => {
-    try {
-      const text = await aiService.triggerMessage({
-        type: "GOAL_COMPLETED",
-        goalTitle: goal.title,
-      });
-      console.log("[AI notify] GOAL_COMPLETED <-", text);
-      notify.show(text);
-    } catch {}
-  };
+  // const handleAllTasksCompleted = async () => {
+  //   try {
+  //     const text = await aiService.triggerMessage({
+  //       type: "GOAL_COMPLETED",
+  //       goalTitle: goal.title,
+  //     });
+  //     console.log("[AI notify] GOAL_COMPLETED <-", text);
+  //     notify.show(text);
+  //   } catch {}
+  // };
 
   return (
     <article className="flex w-full mb-4">
@@ -101,7 +99,6 @@ export function HomeListItem({ goal, index }: Props) {
                 <HomeCompleteGoal
                   goalId={goal.id}
                   award={goal.award}
-                  goalTitle={goal.title}
                 />
               </Dialog>
             </div>
@@ -120,12 +117,6 @@ export function HomeListItem({ goal, index }: Props) {
                     key={i}
                     subGoal={subGoal}
                     index={i + 1}
-                    goalTitle={goal.title}
-                    total={goal.subGoals?.length || 0}
-                    completedCount={
-                      goal.subGoals?.filter((sg) => sg.isCompleted).length || 0
-                    }
-                    onAllTasksCompleted={handleAllTasksCompleted}
                   />
                 ))}
               </tbody>

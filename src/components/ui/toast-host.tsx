@@ -1,21 +1,9 @@
-import { useEffect, useState } from "react";
-import { notify } from "@/lib/notify";
+import { useState } from "react";
 
 type Toast = { id: number; text: string };
 
 export function ToastHost() {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-
-  useEffect(() => {
-    // const unsub = notify.subscribe((text) => {
-    //   const id = Date.now();
-    //   setToasts((prev) => [...prev, { id, text }]);
-    //   setTimeout(() => {
-    //     setToasts((prev) => prev.filter((t) => t.id !== id));
-    //   }, 3500);
-    // });
-    // return () => unsub();
-  }, []);
+  const [toasts] = useState<Toast[]>([]);
 
   if (!toasts.length) return null;
 
