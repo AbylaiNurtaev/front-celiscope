@@ -11,7 +11,7 @@ import { parseInitDataQuery } from "@telegram-apps/sdk";
 const queryClient = new QueryClient();
 
 // Безопасный парсинг initData: в браузере вне Telegram строка может отсутствовать
-const rawInitData = (window as any)?.Telegram?.WebApp?.initData || "";
+// const rawInitData = (window as any)?.Telegram?.WebApp?.initData || "";
 // let initData = null as any;
 // if (rawInitData) {
 //   try {
