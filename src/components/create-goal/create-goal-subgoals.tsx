@@ -20,7 +20,6 @@ export function CreateGoalSubGoal({
   );
   const [subGoalCreateOpen, setSubGoalCreateOpen] = useState<boolean>(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingPopupOpen, setEditingPopupOpen] = useState<boolean>(false);
   const [manualDateText, setManualDateText] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [hasGenerated, setHasGenerated] = useState<boolean>(false);
@@ -143,7 +142,7 @@ export function CreateGoalSubGoal({
     setSubGoalDateTemp(d);
     setManualDateText(formatDateToManual(d));
     setEditingIndex(index);
-    setEditingPopupOpen(true);
+    setSubGoalCreateOpen(true);
   };
 
   const handleUpdateSubGoal = () => {
@@ -161,7 +160,7 @@ export function CreateGoalSubGoal({
     setValue("subGoals", updatedSubGoals);
     setSubGoalTemp("");
     setSubGoalDateTemp(new Date());
-    setEditingPopupOpen(false);
+    setSubGoalCreateOpen(false);
     setEditingIndex(null);
   };
 
@@ -169,13 +168,6 @@ export function CreateGoalSubGoal({
     setSubGoalTemp("");
     setSubGoalDateTemp(new Date());
     setSubGoalCreateOpen(false);
-    setEditingIndex(null);
-  };
-
-  const handleCloseEditingPopup = () => {
-    setSubGoalTemp("");
-    setSubGoalDateTemp(new Date());
-    setEditingPopupOpen(false);
     setEditingIndex(null);
   };
 
@@ -206,88 +198,9 @@ export function CreateGoalSubGoal({
                 >
                   <XIcon size={24} />
                 </button>
-                <Popup
-                  open={editingPopupOpen && editingIndex === index}
-                  contentStyle={{
-                    width: "300px",
-                  }}
-                  onClose={handleCloseEditingPopup}
-                  position="left center"
-                  arrow={false}
-                  trigger={
-                    <button
-                      type="button"
-                      onClick={() => handleEditSubGoal(index)}
-                    >
-                      <EditIcon size={24} />
-                    </button>
-                  }
-                >
-                  <div className="w-full flex items-center gap-2">
-                    <textarea
-                      value={subGoalTemp}
-                      onChange={(e) => setSubGoalTemp(e.target.value)}
-                      placeholder="Введите задачу"
-                      required
-                      className="w-full outline-none resize-none"
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleUpdateSubGoal}
-                      className="aspect-square !p-2 rounded-sm"
-                    >
-                      <CheckIcon />
-                    </Button>
-                  </div>
-                  <div className="mt-3">
-                    Крайний срок
-                    <div className="flex items-center gap-2 mt-2">
-                      <input
-                        type="text"
-                        placeholder="ДД:ММ:ГГГГ ЧЧ:ММ"
-                        value={manualDateText}
-                        onChange={(e) => {
-                          const formatted = formatManualInput(e.target.value);
-                          setManualDateText(formatted);
-                          const parsed = tryParseManual(formatted);
-                          if (parsed) setSubGoalDateTemp(parsed);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Backspace" && manualDateText) {
-                            e.preventDefault();
-                            const digits = manualDateText.replace(/\D/g, "");
-                            const nextDigits = digits.slice(0, -1);
-                            const nextFormatted =
-                              formatDigitsToManual(nextDigits);
-                            setManualDateText(nextFormatted);
-                            const parsed = tryParseManual(nextFormatted);
-                            if (parsed) setSubGoalDateTemp(parsed);
-                          }
-                        }}
-                        className="w-4/5 outline-none resize-none border p-2 rounded-md border-gray-100"
-                      />
-                      <div className="relative w-1/5">
-                        <input
-                          type="datetime-local"
-                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              const d = new Date(e.target.value);
-                              setSubGoalDateTemp(d);
-                              setManualDateText(formatDateToManual(d));
-                            }
-                          }}
-                        />
-                        <Button
-                          type="button"
-                          className="!p-2 w-full rounded-md flex items-center justify-center pointer-events-none"
-                        >
-                          <Calendar size={18} />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Popup>
+                <button type="button" onClick={() => handleEditSubGoal(index)}>
+                  <EditIcon size={24} />
+                </button>
               </td>
             </tr>
           ))}
@@ -321,7 +234,11 @@ export function CreateGoalSubGoal({
                   />
                   <Button
                     type="button"
-                    onClick={handleAddSubGoal}
+                    onClick={
+                      editingIndex !== null
+                        ? handleUpdateSubGoal
+                        : handleAddSubGoal
+                    }
                     className="aspect-square !p-2 rounded-sm"
                   >
                     <CheckIcon />

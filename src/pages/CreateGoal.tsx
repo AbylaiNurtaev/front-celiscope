@@ -96,7 +96,6 @@ export function CreateGoal() {
       data: cleanedData,
     });
   };
-
   return (
     <section className="relative pb-20">
       <Link to="/" className="p-3 flex justify-end">
@@ -223,6 +222,8 @@ function TemplateGoalGenerator({
               shortDescription: watch("shortDescription"),
             });
             console.log("[AI] /ai/goal/template <- response:", resp);
+            if (resp.title)
+              setValue("title", resp.title as any, { shouldDirty: true });
             if (resp.description)
               setValue("description", resp.description as any, {
                 shouldDirty: true,
