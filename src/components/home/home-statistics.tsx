@@ -16,7 +16,7 @@ export function HomeStatistics() {
 	
 	// Подготавливаем данные для графика прогресса целей
 	const barChartData = useMemo(() => {
-		if (!goalsData?.data) return []
+		if (!goalsData?.data || !Array.isArray(goalsData.data)) return []
 		
 		// Фильтруем незавершенные цели и сортируем по дате создания (новые сверху)
 		const data = goalsData.data
@@ -25,8 +25,8 @@ export function HomeStatistics() {
 			.slice(0, 10)
 			.map((goal: Goal, index: number) => {
 				// Вычисляем процент выполнения на основе подцелей
-				const totalSubGoals = goal.subGoals?.length || 0
-				const completedSubGoals = goal.subGoals?.filter(sub => sub.isCompleted).length || 0
+				const totalSubGoals = Array.isArray(goal.subGoals) ? goal.subGoals.length : 0
+				const completedSubGoals = Array.isArray(goal.subGoals) ? goal.subGoals.filter(sub => sub.isCompleted).length : 0
 				
 				let percent: number
 				if (totalSubGoals === 0) {
@@ -48,7 +48,7 @@ export function HomeStatistics() {
 	
 	// Подготавливаем данные для графика выполненных подзадач по месяцам
 	const lineChartData = useMemo(() => {
-		if (!goalsData?.data) return []
+		if (!goalsData?.data || !Array.isArray(goalsData.data)) return []
 		
 		// Создаем массив для всех месяцев
 		const months = [
@@ -61,7 +61,7 @@ export function HomeStatistics() {
 		
 		// Подсчитываем выполненные подзадачи по месяцам
 		goalsData.data.forEach((goal: Goal) => {
-			if (goal.subGoals) {
+			if (Array.isArray(goal.subGoals)) {
 				goal.subGoals.forEach(subGoal => {
 					if (subGoal.isCompleted && subGoal.completedAt) {
 						const completedDate = new Date(subGoal.completedAt)
@@ -81,9 +81,9 @@ export function HomeStatistics() {
 
 	// Подсчитываем общее количество выполненных подзадач
 	const totalCompletedSubGoals = useMemo(() => {
-		if (!goalsData?.data) return 0
+		if (!goalsData?.data || !Array.isArray(goalsData.data)) return 0
 		return goalsData.data.reduce((total: number, goal: Goal) => {
-			const completedSubGoals = goal.subGoals?.filter(sub => sub.isCompleted).length || 0
+			const completedSubGoals = Array.isArray(goal.subGoals) ? goal.subGoals.filter(sub => sub.isCompleted).length : 0
 			return total + completedSubGoals
 		}, 0)
 	}, [goalsData])
@@ -127,7 +127,7 @@ export function HomeStatistics() {
 	}
 
 	// Показываем сообщение, если нет данных
-	if (!goalsData?.data || goalsData.data.length === 0) {
+	if (!goalsData?.data || !Array.isArray(goalsData.data) || goalsData.data.length === 0) {
 		return (
 			<section className='font-bold text-lg w-full pt-2 px-4'>
 				<div className='relative p-[3px] rounded-xl'>
@@ -162,7 +162,7 @@ export function HomeStatistics() {
 								Всего целей: <span className='font-bold'>{totalGoals}</span>
 							</span>
 							<span className='text-lg font-normal text-nowrap max-[520px]:text-sm max-[440px]:text-xs'>
-								Прогресс целей | <span className='font-bold'>ТОП {Math.min(10, goalsData?.data?.filter((goal: Goal) => !goal.isCompleted).length || 0)}</span>
+								Прогресс целей | <span className='font-bold'>ТОП {Math.min(10, (Array.isArray(goalsData?.data) ? goalsData.data.filter((goal: Goal) => !goal.isCompleted).length : 0) || 0)}</span>
 							</span>
 						</div>
 						{barChartData.length > 0 ? (

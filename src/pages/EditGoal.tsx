@@ -93,10 +93,10 @@ export function EditGoal() {
       setValue("deadline", convertDateToDeadline(new Date(goal.deadline)));
       setValue(
         "subGoals",
-        goal.subGoals?.map((subGoal: SubGoal) => ({
+        Array.isArray(goal.subGoals) ? goal.subGoals.map((subGoal: SubGoal) => ({
           ...subGoal,
           deadline: subGoal.deadline ? new Date(subGoal.deadline) : new Date(),
-        })) || []
+        })) : []
       );
       setValue("currentGoal", goal);
     }
@@ -155,10 +155,10 @@ export function EditGoal() {
             deadline: dataWithoutCurrentGoal.deadline || "3_MONTHS",
             privacy: dataWithoutCurrentGoal.privacy || "PRIVATE",
             award: dataWithoutCurrentGoal.award,
-            subGoals: dataWithoutCurrentGoal.subGoals?.map((subGoal) => ({
+            subGoals: Array.isArray(dataWithoutCurrentGoal.subGoals) ? dataWithoutCurrentGoal.subGoals.map((subGoal) => ({
               description: subGoal.description,
               deadline: new Date(subGoal.deadline),
-            })),
+            })) : [],
           };
           console.log("Cleaned data to send:", cleanedData);
           updateGoal({ data: cleanedData });
@@ -218,10 +218,10 @@ export function EditGoal() {
               deadline: dataWithoutCurrentGoal.deadline || "3_MONTHS",
               privacy: dataWithoutCurrentGoal.privacy || "PRIVATE",
               award: dataWithoutCurrentGoal.award,
-              subGoals: dataWithoutCurrentGoal.subGoals?.map((subGoal) => ({
+              subGoals: Array.isArray(dataWithoutCurrentGoal.subGoals) ? dataWithoutCurrentGoal.subGoals.map((subGoal) => ({
                 description: subGoal.description,
                 deadline: new Date(subGoal.deadline),
-              })),
+              })) : [],
             };
             updateGoal({ data: cleanedData });
           })}

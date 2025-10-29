@@ -44,9 +44,9 @@ export function SettingsFriendsGoals() {
 				</summary>
 				<div className='flex flex-col px-4 gap-6 mt-6'>
 					{friends?.map(friend => {
-						const friendGoals = friendsGoals?.filter(
-							goal => goal.userId === friend.id
-						)?.sort((a: any, b: any) => {
+						const friendGoals = (Array.isArray(friendsGoals) ? friendsGoals : [])
+							.filter(goal => goal.userId === friend.id)
+							.sort((a: any, b: any) => {
 							// Сначала сортируем по статусу выполнения
 							if (a.isCompleted && !b.isCompleted) return 1
 							if (!a.isCompleted && b.isCompleted) return -1
@@ -83,8 +83,8 @@ export function SettingsFriendsGoals() {
 								<div className='bg-white border-2 border-[#27448D] rounded-b-md p-4 flex items-center flex-col gap-2.5'>
 									{friendGoals ? (
 										friendGoals?.map((friendGoal: any, index: number) => {
-											const subGoals = friendGoal.subGoals
-											const completedSubGoals = subGoals?.filter(
+											const subGoals = Array.isArray(friendGoal.subGoals) ? friendGoal.subGoals : []
+											const completedSubGoals = subGoals.filter(
 												(subGoal: SubGoal) => subGoal.isCompleted
 											)
 											const percent =

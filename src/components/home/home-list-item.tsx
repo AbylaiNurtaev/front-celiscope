@@ -19,7 +19,7 @@ export const URGENCY_COLORS = {
 
 export function HomeListItem({ goal, index }: Props) {
   const isSubGoalsCompleted =
-    goal.subGoals && goal.subGoals.length > 0
+    Array.isArray(goal.subGoals) && goal.subGoals.length > 0
       ? goal.subGoals.every((subGoal) => subGoal.isCompleted)
       : true; // Если нет подзадач, считаем цель выполненной
 
@@ -27,7 +27,7 @@ export function HomeListItem({ goal, index }: Props) {
 
   const isExpired = !isCompleted && new Date(goal.deadline) < new Date();
 
-  const isSubGoalExpired = goal.subGoals?.some(
+  const isSubGoalExpired = Array.isArray(goal.subGoals) && goal.subGoals.some(
     (subGoal) => !subGoal.isCompleted && new Date(subGoal.deadline) < new Date()
   );
 
@@ -112,7 +112,7 @@ export function HomeListItem({ goal, index }: Props) {
             />
             <table className="w-full mt-2 border-collapse border border-[#2F51A8]">
               <tbody>
-                {goal.subGoals?.map((subGoal, i) => (
+                {Array.isArray(goal.subGoals) && goal.subGoals.map((subGoal, i) => (
                   <HomeSubGoal
                     key={i}
                     subGoal={subGoal}

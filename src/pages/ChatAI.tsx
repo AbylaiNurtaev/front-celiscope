@@ -32,7 +32,7 @@ export function ChatAI() {
   }, [messages]);
 
   const context = useMemo(() => {
-    const prepared = goals?.map((g: any) => ({
+    const prepared = Array.isArray(goals) ? goals.map((g: any) => ({
       id: g.id,
       title: g.title,
       description: g.description,
@@ -40,11 +40,11 @@ export function ChatAI() {
         completed: g.completedSubGoalsCount || 0,
         total: g.subGoalsCount || 0,
       },
-      subGoals: (g.subGoals || []).map((s: any) => ({
+      subGoals: (Array.isArray(g.subGoals) ? g.subGoals : []).map((s: any) => ({
         description: s.description,
         done: !!s.isCompleted,
       })),
-    }));
+    })) : [];
     // Если выбрана фокусная цель — переносим её первой и добавим подсказку в начало истории
     const focused = selectedGoalTitle
       ? prepared.sort((a: any, b: any) =>
@@ -56,7 +56,7 @@ export function ChatAI() {
         )
       : prepared;
     return { goals: focused };
-  }, [goals]);
+  }, [goals, selectedGoalTitle]);
 
   const send = async () => {
     if (!input.trim()) return;
@@ -110,7 +110,7 @@ export function ChatAI() {
             className="border rounded px-2 py-1 text-sm"
           >
             <option value="">Все цели</option>
-            {goals?.map((g: any) => (
+            {Array.isArray(goals) && goals.map((g: any) => (
               <option key={g.id ?? g.title} value={g.title}>
                 {g.title}
               </option>

@@ -132,7 +132,8 @@ export function CreateGoalSubGoal({
   };
 
   const handleRemoveSubGoal = (index: number) => {
-    const value = watch("subGoals")?.filter((_: any, i: number) => i !== index);
+    const subGoals = watch("subGoals") || [];
+    const value = Array.isArray(subGoals) ? subGoals.filter((_: any, i: number) => i !== index) : [];
     setValue("subGoals", value);
   };
 

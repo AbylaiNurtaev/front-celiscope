@@ -94,20 +94,20 @@ export function HomeList() {
 				</Popup>
 			</div>
 
-			{goals ? (
-				goals?.data?.length ? (
-					goals?.data
-						?.filter(
-							(goal: Goal) =>
-								urgencyLevel === 'all' ||
-								goal.urgencyLevel.toLowerCase() === urgencyLevel
-						)
-						?.sort((a: Goal, b: Goal) => {
-							if (a.isCompleted && !b.isCompleted) return 1
-							if (!a.isCompleted && b.isCompleted) return -1
-							return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-						})
-						?.map((goal: Goal, index: number) => (
+		{goals ? (
+			goals?.data?.length && Array.isArray(goals.data) ? (
+				goals.data
+					.filter(
+						(goal: Goal) =>
+							urgencyLevel === 'all' ||
+							goal.urgencyLevel.toLowerCase() === urgencyLevel
+					)
+					.sort((a: Goal, b: Goal) => {
+						if (a.isCompleted && !b.isCompleted) return 1
+						if (!a.isCompleted && b.isCompleted) return -1
+						return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+					})
+					.map((goal: Goal, index: number) => (
 							<HomeListItem goal={goal} key={index} index={index + 1} />
 						))
 				) : (
